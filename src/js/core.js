@@ -155,18 +155,35 @@ const GITHUB_SVG_ICON =
    sidebar brand <img>s all point at it statically). assemble.ps1 creates a TT-mark
    placeholder when the dev folder lacks one; forks ship their own. ── */
 
-/* ── optional heading typeface (reference §11): load CONFIG.headingFontUrl into
-   <head> and set --heading-font, which the h1–h6/#headerTitle CSS already consumes.
-   Omitting either knob is a no-op (the var falls back to the body font). ── */
+/* ── optional heading typeface (reference §11): load CONFIG.headingFontUrl and set
+   --heading-font, which the h1–h6/#headerTitle CSS already consumes. The URL may be
+   a stylesheet (e.g. Google Fonts) or a font file (.woff2/.woff/.ttf/.otf); a font
+   file is registered under the first family in CONFIG.headingFont. Omitting either
+   knob is a no-op (the var falls back to the body font). ── */
+const isFontFileUrl = ( url ) => /\.(woff2?|ttf|otf)([?#]|$)/i.test( url || '' );
+// First family of a CSS font-family list, unquoted: '"Windsor", serif' → 'Windsor'.
+const firstFontFamily = ( list ) => ( list || '' ).split( ',' )[ 0 ].trim().replace( /^["']|["']$/g, '' );
+const loadedFontFiles = new Set();
+const loadFontFile = ( url, family ) => {
+  const key = `${ family }|${ url }`;
+  if ( !family || loadedFontFiles.has( key ) ) return;
+  loadedFontFiles.add( key );
+  const face = new FontFace( family, `url("${ url.replace( /"/g, '%22' ) }")` );
+  document.fonts.add( face );
+  face.load().catch( () => console.warn( `Heading font failed to load: ${ url }` ) );
+};
 const applyHeadingFont = () => {
-  if ( CONFIG.headingFontUrl ) {
+  const url = CONFIG.headingFontUrl;
+  const family = CONFIG.headingFont || ( isFontFileUrl( url ) ? '"TooToo Heading", serif' : '' );
+  if ( isFontFileUrl( url ) ) loadFontFile( url, firstFontFamily( family ) );
+  else if ( url ) {
     const link = document.createElement( 'link' );
     link.rel = 'stylesheet';
-    link.href = CONFIG.headingFontUrl;
+    link.href = url;
     document.head.appendChild( link );
   }
-  if ( CONFIG.headingFont ) {
-    document.documentElement.style.setProperty( '--heading-font', CONFIG.headingFont );
+  if ( family ) {
+    document.documentElement.style.setProperty( '--heading-font', family );
   }
 };
 

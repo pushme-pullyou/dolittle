@@ -17,7 +17,8 @@ the single-file GitHub repo viewer. JipJip, DabDab and GubGub will be born here 
 
 ## How changes flow
 
-1. Edit the component sources in [`src/`](src/) — `js/`, `styles.css`, `components/`, `config.js`.
+1. Edit the component sources in [`src/`](src/) — each `components/<name>/` folder
+   holds its HTML, JavaScript, and README; shared code lives in `js/`.
 2. `pwsh -File assemble.ps1` → builds the dev `index.html` beside it. Test via `file://`.
 3. `promote` regenerates production `index.html` in the sibling
    [`pushme-pullyou-tootoo`](https://github.com/pushme-pullyou/tootoo) repo

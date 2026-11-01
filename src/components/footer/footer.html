@@ -5,30 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TooToo — Footer (dev)</title>
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../../styles.css">
   <style>
-    .dev-note {
-      margin: 1rem;
-      padding: 0.75rem 1rem;
-      border: 1px dashed var(--border-color);
-      border-radius: 8px;
-      background: var(--secondary-bg);
-      font-size: 0.9rem;
-    }
-
     body {
-      justify-content: space-between;
+      justify-content: flex-end;
     }
   </style>
 </head>
 
 <body>
-
-  <div class="dev-note">
-    🧪 <strong>Footer component.</strong> A new page-level footer (the single-file
-    app has none yet). Brand text comes from <code>CONFIG</code> via
-    <code>renderFooter()</code>.
-  </div>
 
   <!-- @part:footer:start -->
   <footer class="app-footer">
@@ -40,14 +25,14 @@
   </footer>
   <!-- @part:footer:end -->
 
-  <script src="../js/core.js"></script>
-  <script src="../mock/mock-data.js"></script>
-  <script src="../js/footer.js"></script>
+  <script src="../../js/core.js"></script>
+  <script src="../../mock/mock-data.js"></script>
+  <script src="footer.js"></script>
   <script>
     renderFooter();
     // Standalone page: the mark's static src="favicon.ico" resolves relative to
-    // this file (src/components/), so point it at the dev folder's generated one.
-    document.querySelector( '.app-footer-mark' ).src = '../../favicon.ico';
+    // this file (src/components/footer/), so point it at the dev folder's generated one.
+    document.querySelector( '.app-footer-mark' ).src = '../../../favicon.ico';
   </script>
 
 </body>

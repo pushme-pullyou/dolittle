@@ -44,8 +44,9 @@ Example flows:
 ## Component contracts
 
 Each component: a **mission**, the **DOM** it owns, what state it **writes** vs
-**reads**, and the **functions it exposes**. In the dev setup each becomes one file in
-`src/components/` (markup) + one in `src/js/` (behavior).
+**reads**, and the **functions it exposes**. In the dev setup each UI component
+keeps its markup, behavior, and notes together in a named folder under
+`src/components/`.
 
 ### 🟦 Header — "Where are we?"
 - **Owns DOM:** the `<header>` bar; the About + Token dialogs.
@@ -96,8 +97,12 @@ src/
   styles.css            shared (base tokens + per-component sections appended)
   config.js             dev config — bakes a default repo + dev identity for standalone testing
   config.prod.js        empty production config — keeps the shipped build neutral
-  components/  header.html  sidebar.html  content.html  footer.html
-  js/          core.js  header.js  sidebar.js  content.js  footer.js  main.js
+  components/
+    header/  README-header.md  header.html  header.js
+    sidebar/ README-sidebar.md sidebar.html sidebar.js
+    content/ README-content.md content.html content.js
+    footer/  README-footer.md  footer.html  footer.js
+  js/          core.js  main.js
   mock/        mock-data.js   (sample CONFIG, state, tree, file blob)
 ```
 
@@ -106,8 +111,9 @@ config block: the **dev build** (`../index.html`, includes `config.js`) and the
 **production build** (`-Prod`, includes `config.prod.js`, written to the sibling
 `pushme-pullyou-tootoo` repo). See [`../PIPELINE.md`](../PIPELINE.md).
 
-Each `components/*.html` page mocks **exactly the state slice it reads** — so the
-page is a runnable copy of that component's contract. If a page has to mock a
+Each component's `*.html` page mocks **exactly the state slice it reads** — so the
+page is a runnable copy of that component's contract. Its folder README describes
+the component's responsibilities and standalone page. If a page has to mock a
 field the table doesn't grant it, the boundary is wrong.
 
 ## Open boundary to confirm

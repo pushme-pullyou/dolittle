@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TooToo — Sidebar (dev)</title>
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../../styles.css">
   <style>
     /* Page-only scaffolding (the dev pane to the right of the sidebar). */
     .dev-pane {
@@ -79,7 +79,7 @@
       <p>
         The real sidebar, running standalone on <strong>mock data</strong>
         (<code>state.tree</code> from <code>mock/mock-data.js</code>), styled by the
-        shared <code>styles.css</code>, logic in <code>js/sidebar.js</code>, helpers
+        shared <code>styles.css</code>, logic in <code>sidebar.js</code>, helpers
         in <code>js/core.js</code>. Everything inside the <code>@part:sidebar</code>
         markers is the extractable fragment.
       </p>
@@ -101,15 +101,15 @@
   </main>
 
   <!-- Component dependencies (core first, then data, then the component). -->
-  <script src="../js/core.js"></script>
-  <script src="../mock/mock-data.js"></script>
-  <script src="../js/sidebar.js"></script>
+  <script src="../../js/core.js"></script>
+  <script src="../../mock/mock-data.js"></script>
+  <script src="sidebar.js"></script>
 
   <!-- Dev harness: the Content stub + footer icon + resizer drag + init.
        None of this is part of the sidebar component. -->
   <script>
     // Content owns currentFilePath; here it's a stub that just shows the hand-off.
-    // (In the assembled build, content.js provides the real selectFile.)
+    // (In the assembled build, the Content component provides the real selectFile.)
     const selectFile = ( path ) => {
       state.currentFilePath = path;
       document.querySelectorAll( '.tree-item' ).forEach( ( el ) =>
@@ -120,8 +120,8 @@
     // Footer icon, scroll-to-top, and resizer drag now live in sidebar.js (initSidebar).
     initSidebar();
     // Standalone page: the footer mark's static src="favicon.ico" resolves relative to
-    // this file (src/components/), so point it at the dev folder's generated one.
-    document.querySelector( '#btnScrollTreeTop img' ).src = '../../favicon.ico';
+    // this file (src/components/sidebar/), so point it at the dev folder's generated one.
+    document.querySelector( '#btnScrollTreeTop img' ).src = '../../../favicon.ico';
   </script>
 
 </body>

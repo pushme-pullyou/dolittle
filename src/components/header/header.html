@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="revised" content="2026-07-06 12:05">
   <title>TooToo — Header (dev)</title>
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../../styles.css">
   <style>
     /* Page-only scaffolding. Ignored by the assembler (outside @part). */
     .dev-note {
@@ -23,6 +23,42 @@
       background: var(--hover-bg);
       padding: 0 0.25rem;
       border-radius: 4px;
+    }
+
+    .dev-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0.5rem;
+      overflow-y: auto;
+    }
+
+    .dev-menu button {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font: inherit;
+      text-align: left;
+      padding: 0.4rem 0.6rem;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-color);
+      cursor: pointer;
+    }
+
+    .dev-menu button:hover,
+    .dev-menu button:focus-visible,
+    .dev-menu button[aria-pressed="true"] {
+      background: var(--hover-bg);
+      color: var(--highlight-fg);
+    }
+
+    .dev-content {
+      min-width: 0;
+      overflow-y: auto;
+      padding-bottom: 1rem;
     }
 
     .dev-controls {
@@ -54,7 +90,7 @@
       padding: 0.2rem 0.4rem;
     }
 
-    .dev-presets {
+    #devFonts {
       display: flex;
       flex-wrap: wrap;
       gap: 0.4rem;
@@ -62,12 +98,12 @@
       margin: 0 1rem 0.5rem;
     }
 
-    .dev-presets span {
+    #devFonts span {
       font-size: 0.85rem;
       opacity: 0.8;
     }
 
-    .dev-presets button {
+    #devFonts button {
       font: inherit;
       font-size: 0.85rem;
       padding: 0.2rem 0.6rem;
@@ -77,7 +113,7 @@
       cursor: pointer;
     }
 
-    .dev-presets button:hover {
+    #devFonts button:hover {
       border-color: var(--highlight-color);
       color: var(--highlight-color);
     }
@@ -92,7 +128,7 @@
       aria-controls="sidebar" aria-expanded="true">☰</button>
     <a id="headerGitHub" href="." title="View on GitHub" aria-label="View on GitHub">
       <!-- App brand mark: the deployment's favicon.ico (static; the standalone
-           harness rewrites the src to ../../favicon.ico). aria-hidden: the anchor's
+           harness rewrites the src to ../../../favicon.ico). aria-hidden: the anchor's
            aria-label names the link. -->
       <img id="headerBrand" src="favicon.ico" width="18" height="18" alt="" aria-hidden="true">
     </a>
@@ -129,48 +165,69 @@
   </header>
   <!-- @part:header:end -->
 
-  <div class="dev-note">
-    🧪 <strong>Standalone header component.</strong> The real header bar, driven by
-    <code>js/header.js</code> reading <code>state</code>/<code>CONFIG</code> (mock) + <code>meta[revised]</code>.
-    Try 🌙 / A− / A+ and hover the title for the tooltip. Click <strong>Load example</strong>
-    to swap in a real repo's identity, or use the controls below to mutate repo identity +
-    appearance live. (? / ⚙️ are inert here — their panels need a content area this page omits.)
-  </div>
+  <main>
+    <aside class="sidebar" id="sidebar" aria-label="Preview menu">
+      <div class="panel-header">
+        <h3>Installs</h3>
+      </div>
+      <nav class="dev-menu" aria-label="TooToo install previews">
+        <button type="button" data-owner="heritage-happenings" data-repo="heritage-happenings.github.io" data-branch="main" aria-pressed="false">heritage-happenings.github.io</button>
+        <button type="button" data-owner="heritage-happenings" data-repo="documents" data-branch="main" aria-pressed="false">heritage-happenings-documents</button>
+        <button type="button" data-owner="pushme-pullyou" data-repo="assets" data-branch="main" aria-pressed="false">pushme-pullyou-assets</button>
+        <button type="button" data-owner="pushme-pullyou" data-repo="2019" data-branch="master" aria-pressed="false">pushme-pullyou-github</button>
+        <button type="button" data-owner="pushme-pullyou" data-repo="pushme-pullyou.github.io" data-branch="main" aria-pressed="false">pushme-pullyou-github-io</button>
+        <button type="button" data-owner="theo-armour" data-repo="2025" data-branch="main" aria-pressed="false">theo-armour-2025</button>
+        <button type="button" data-owner="theo-armour" data-repo="2026" data-branch="main" aria-pressed="false">theo-armour-2026</button>
+        <button type="button" data-owner="theo-armour" data-repo="aa" data-branch="main" aria-pressed="false">theo-armour-aa</button>
+        <button type="button" data-owner="theo-armour" data-repo="agenda" data-branch="main" aria-pressed="false">theo-armour-agenda</button>
+        <button type="button" data-owner="theo-armour" data-repo="collection" data-branch="main" aria-pressed="false">theo-armour-collection</button>
+        <button type="button" data-owner="theo-armour" data-repo="genealogy" data-branch="main" aria-pressed="false">theo-armour-genealogy</button>
+        <button type="button" data-owner="theo-armour" data-repo="pages" data-branch="main" aria-pressed="false">theo-armour-pages</button>
+        <button type="button" data-owner="theo-armour" data-repo="qdata" data-branch="main" aria-pressed="false">theo-armour-qdata</button>
+        <button type="button" data-owner="theo-armour" data-repo="sandbox" data-branch="main" aria-pressed="false">theo-armour-sandbox</button>
+        <button type="button" data-owner="theo-armour" data-repo="wikitheo" data-branch="main" aria-pressed="false">theo-armour-wikitheo</button>
+        <button type="button" data-owner="heritage-happenings" data-repo="tech" data-branch="main" aria-pressed="false">tech</button>
+      </nav>
+    </aside>
 
-  <div class="dev-presets" id="devPresets">
-    <span>Load example:</span>
-  </div>
+    <section class="content-area dev-content" id="contentArea" aria-label="Header preview">
+      <div class="panel-header file-header">
+        <h3>Header component preview</h3>
+      </div>
+      <div id="contentBody">
+        <div class="dev-controls">
+          <h2>🎛️ Header preview settings</h2>
+          <label for="ctlOwner">owner</label>
+          <input id="ctlOwner" type="text" placeholder="e.g. pushme-pullyou">
+          <label for="ctlRepo">repo</label>
+          <input id="ctlRepo" type="text" placeholder="e.g. tootoo">
+          <label for="ctlBranch">branch</label>
+          <input id="ctlBranch" type="text" placeholder="e.g. main">
+          <label for="ctlSubtitle">subtitle</label>
+          <input id="ctlSubtitle" type="text" placeholder="(empty)">
+          <label for="ctlColor">themeColor</label>
+          <input id="ctlColor" type="color">
+          <label for="ctlAppName">appName</label>
+          <input id="ctlAppName" type="text" placeholder="shown when owner+repo empty">
+          <label for="ctlSource">sourceRepoUrl</label>
+          <input id="ctlSource" type="url" placeholder="https://github.com/…">
+          <label for="ctlFontUrl">headingFontUrl</label>
+          <input id="ctlFontUrl" type="url" placeholder="Google Fonts CSS or .woff2/.ttf URL">
+          <label for="ctlFont">headingFont</label>
+          <input id="ctlFont" type="text" placeholder='e.g. "Patua One", serif'>
+        </div>
 
-  <div class="dev-controls">
-    <h2>🎛️ Header preview settings</h2>
-    <label for="ctlOwner">owner</label>
-    <input id="ctlOwner" type="text" placeholder="e.g. pushme-pullyou">
-    <label for="ctlRepo">repo</label>
-    <input id="ctlRepo" type="text" placeholder="e.g. tootoo">
-    <label for="ctlBranch">branch</label>
-    <input id="ctlBranch" type="text" placeholder="e.g. main">
-    <label for="ctlSubtitle">subtitle</label>
-    <input id="ctlSubtitle" type="text" placeholder="(empty)">
-    <label for="ctlColor">themeColor</label>
-    <input id="ctlColor" type="color">
-    <label for="ctlAppName">appName</label>
-    <input id="ctlAppName" type="text" placeholder="shown when owner+repo empty">
-    <label for="ctlSource">sourceRepoUrl</label>
-    <input id="ctlSource" type="url" placeholder="https://github.com/…">
-    <label for="ctlFontUrl">headingFontUrl</label>
-    <input id="ctlFontUrl" type="url" placeholder="Google Fonts / .woff2 URL">
-    <label for="ctlFont">headingFont</label>
-    <input id="ctlFont" type="text" placeholder='e.g. "Patua One", serif'>
-  </div>
-
-  <div class="dev-presets" id="devFonts">
-    <span>Heading font:</span>
-  </div>
+        <div class="dev-presets" id="devFonts">
+          <span>Heading font:</span>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <!-- Component dependencies. -->
-  <script src="../js/core.js"></script>
-  <script src="../mock/mock-data.js"></script>
-  <script src="../js/header.js"></script>
+  <script src="../../js/core.js"></script>
+  <script src="../../mock/mock-data.js"></script>
+  <script src="header.js"></script>
 
   <!-- Dev harness: seed control values, then mutate CONFIG + re-render. -->
   <script>
@@ -178,8 +235,8 @@
 
     initHeader();
     // Standalone page: the brand mark's static src="favicon.ico" resolves relative to
-    // this file (src/components/), so point it at the dev folder's generated one.
-    byId( 'headerBrand' ).src = '../../favicon.ico';
+    // this file (src/components/header/), so point it at the dev folder's generated one.
+    byId( 'headerBrand' ).src = '../../../favicon.ico';
     byId( 'ctlOwner' ).value = state.owner || CONFIG.owner || '';
     byId( 'ctlRepo' ).value = state.repo || CONFIG.repo || '';
     byId( 'ctlBranch' ).value = state.branch || CONFIG.branch || '';
@@ -205,23 +262,29 @@
     } );
 
     // headingFont sets --heading-font (consumed by #headerTitle + h1–h6 CSS);
-    // empty clears it so the var falls back to the body font.
+    // empty clears it so the var falls back to the body font. A font-file URL is
+    // registered under this family, so re-register when the family changes.
     const reflectHeadingFont = () => byId( 'ctlFont' ).addEventListener( 'input', ( e ) => {
       const value = e.target.value;
       CONFIG.headingFont = value;
       const root = document.documentElement.style;
       if ( value ) root.setProperty( '--heading-font', value );
       else root.removeProperty( '--heading-font' );
+      if ( isFontFileUrl( CONFIG.headingFontUrl ) ) loadFontFile( CONFIG.headingFontUrl, firstFontFamily( value ) );
     } );
 
-    // headingFontUrl loads a stylesheet. Reuse a single <link> (vs. core.js's
-    // applyHeadingFont, which appends a fresh one each call) so live edits don't
-    // pile up stale font links in the dev page's <head>.
+    // headingFontUrl loads a stylesheet or a font file (core.js loadFontFile). Reuse a
+    // single <link> (vs. core.js's applyHeadingFont, which appends a fresh one each
+    // call) so live edits don't pile up stale font links in the dev page's <head>.
     const reflectFontUrl = () => byId( 'ctlFontUrl' ).addEventListener( 'input', ( e ) => {
       const value = e.target.value.trim();
       CONFIG.headingFontUrl = value;
       let link = byId( 'devHeadingFontLink' );
-      if ( !value ) { link?.remove(); return; }
+      if ( !value || isFontFileUrl( value ) ) {
+        link?.remove();
+        if ( value ) loadFontFile( value, firstFontFamily( CONFIG.headingFont ) );
+        return;
+      }
       if ( !link ) {
         link = document.createElement( 'link' );
         link.id = 'devHeadingFontLink';
@@ -266,78 +329,60 @@
     reflectFontUrl();
     syncBranchChip();
 
+    document.querySelectorAll( '.dev-menu button' ).forEach( ( button ) => {
+      button.addEventListener( 'click', () => {
+        const setInput = ( id, value ) => {
+          const input = byId( id );
+          input.value = value;
+          input.dispatchEvent( new Event( 'input', { bubbles: true } ) );
+        };
+        setInput( 'ctlOwner', button.dataset.owner );
+        setInput( 'ctlRepo', button.dataset.repo );
+        setInput( 'ctlBranch', button.dataset.branch );
+        setInput( 'ctlSource', `https://github.com/${ button.dataset.owner }/${ button.dataset.repo }` );
+        document.querySelectorAll( '.dev-menu button' ).forEach( ( item ) =>
+          item.setAttribute( 'aria-pressed', String( item === button ) ) );
+      } );
+    } );
+
+    // ── ? / ⚙️ panels: header.js renders them via content.js/sidebar.js helpers this
+    // page doesn't load. Minimal stand-ins below; the preview header + controls are
+    // detached (not re-rendered) while a panel is open, so their listeners survive. ──
+    let savedPreview = null;
+    const restorePreview = () => {
+      if ( !savedPreview ) return;
+      byId( 'contentArea' ).querySelector( '.file-header' ).replaceWith( savedPreview.header );
+      byId( 'contentBody' ).replaceChildren( savedPreview.body );
+      savedPreview = null;
+    };
+    const makeSimpleHeader = ( title ) => {
+      const d = document.createElement( 'div' );
+      d.className = 'panel-header file-header';
+      d.innerHTML = `<div class="file-title"><h3 id="breadcrumbs">${ escapeHTML( title ) }</h3></div>`;
+      return d;
+    };
+    const setContentHeader = ( el ) => {
+      const existing = byId( 'contentArea' ).querySelector( '.file-header' );
+      if ( !savedPreview ) {
+        const body = document.createDocumentFragment();
+        body.append( ...byId( 'contentBody' ).childNodes );
+        savedPreview = { header: existing, body };
+      }
+      existing.replaceWith( el );
+    };
+    const selectFile = restorePreview;
+    const autoSelectReadme = restorePreview;
+    const runSelfTest = () => {
+      byId( 'btnSelfTest' ).insertAdjacentHTML( 'afterend',
+        '<p class="dev-note">Self-test needs the full app (content renderers + repo tree). Run it from <code>index.html</code>.</p>' );
+    };
+
     // The harness doesn't load main.js (so applyHeadingFont never runs), yet the
     // controls are seeded from CONFIG.headingFont. Apply that seed through the managed
     // -link path so the preview matches the panel — not a raw applyHeadingFont(), which
     // would append an unmanaged <link> and reintroduce the stale-link pileup.
     byId( 'ctlFontUrl' ).dispatchEvent( new Event( 'input' ) );
     byId( 'ctlFont' ).dispatchEvent( new Event( 'input' ) );
-
-    // ── Example presets: one click fills every control with a real repo's
-    // identity + branding. Each field is set then fired through the existing
-    // 'input' handlers, so the header re-renders just as if it were typed. ──
-    const PRESETS = [
-      {
-        name: 'TooToo',
-        owner: 'pushme-pullyou', repo: 'tootoo', branch: 'main',
-        appName: 'TooToo', subtitle: 'Single-file GitHub repository browser',
-        themeColor: '#3a8856', sourceRepoUrl: 'https://github.com/pushme-pullyou/tootoo',
-        headingFontUrl: 'https://fonts.googleapis.com/css2?family=Patua+One&display=swap',
-        headingFont: '"Patua One", serif',
-      },
-      {
-        name: 'React',
-        owner: 'facebook', repo: 'react', branch: 'main',
-        appName: 'React', subtitle: 'A library for web and native user interfaces',
-        themeColor: '#149eca', sourceRepoUrl: 'https://github.com/facebook/react',
-        headingFontUrl: '', headingFont: '',
-      },
-      {
-        name: 'Linux',
-        owner: 'torvalds', repo: 'linux', branch: 'master',
-        appName: 'Linux', subtitle: 'Linux kernel source tree',
-        themeColor: '#d4a017', sourceRepoUrl: 'https://github.com/torvalds/linux',
-        headingFontUrl: 'https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap',
-        headingFont: '"Courier Prime", monospace',
-      },
-      {
-        name: 'VS Code',
-        owner: 'microsoft', repo: 'vscode', branch: 'main',
-        appName: 'VS Code', subtitle: 'Code editing. Redefined.',
-        themeColor: '#007acc', sourceRepoUrl: 'https://github.com/microsoft/vscode',
-        headingFontUrl: '', headingFont: '',
-      },
-    ];
-
-    const applyPreset = ( p ) => {
-      const set = ( id, value ) => {
-        const el = byId( id );
-        // <input type=color> can't hold '' (it snaps to #000000), so leave the
-        // swatch unchanged when a preset omits the color rather than forcing black.
-        if ( el.type === 'color' && !value ) return;
-        el.value = value || '';
-        el.dispatchEvent( new Event( 'input', { bubbles: true } ) );
-      };
-      set( 'ctlOwner', p.owner );
-      set( 'ctlRepo', p.repo );
-      set( 'ctlBranch', p.branch );
-      set( 'ctlSubtitle', p.subtitle );
-      set( 'ctlColor', p.themeColor );
-      set( 'ctlAppName', p.appName );
-      set( 'ctlSource', p.sourceRepoUrl );
-      set( 'ctlFontUrl', p.headingFontUrl );
-      set( 'ctlFont', p.headingFont );
-    };
-
-    const presetBar = byId( 'devPresets' );
-    PRESETS.forEach( ( p ) => {
-      const btn = document.createElement( 'button' );
-      btn.type = 'button';
-      btn.textContent = p.name;
-      btn.title = `${ p.owner }/${ p.repo } @ ${ p.branch }`;
-      btn.addEventListener( 'click', () => applyPreset( p ) );
-      presetBar.appendChild( btn );
-    } );
 
     // ── Quick heading-font swatches: each button just drives the headingFont +
     // headingFontUrl controls (via their 'input' handlers). 'None' clears both to
@@ -348,6 +393,7 @@
       { name: 'Bitter', headingFont: '"Bitter", serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Bitter:wght@600&display=swap' },
       { name: 'Sigmar', headingFont: '"Sigmar", sans-serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Sigmar&display=swap' },
       { name: 'Rammetto One', headingFont: '"Rammetto One", sans-serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Rammetto+One&display=swap' },
+      { name: 'Windsor', headingFont: '"Windsor", serif', headingFontUrl: 'https://pushme-pullyou.github.io/assets/fonts/Windsor%20Regular.ttf' },
       { name: 'None', headingFont: '', headingFontUrl: '' },
     ];
     const applyFont = ( f ) => {
@@ -356,8 +402,11 @@
         el.value = value;
         el.dispatchEvent( new Event( 'input', { bubbles: true } ) );
       };
-      fire( 'ctlFontUrl', f.headingFontUrl );
+      // Clear the URL, set the family, then the URL: a font file registers under the
+      // current family, so it must never pair with the previous swatch's name.
+      fire( 'ctlFontUrl', '' );
       fire( 'ctlFont', f.headingFont );
+      fire( 'ctlFontUrl', f.headingFontUrl );
     };
     const fontBar = byId( 'devFonts' );
     FONTS.forEach( ( f ) => {

@@ -141,6 +141,7 @@ const showTokenPanel = ( reasonHtml = '' ) => {
         <label for="inpToken">Token${ hasToken ? ' (currently set)' : '' }</label>
         <input id="inpToken" type="password" placeholder="${ hasToken ? '•••••••• (leave blank to keep)' : 'ghp_…' }" autocomplete="off" spellcheck="false">
         <label><input id="inpTokenShow" type="checkbox"> Show token</label>
+        <p id="tokenSaveError" class="error-panel" role="alert" hidden></p>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <button id="btnTokenSave" class="primary" title="Save token and reload">Save</button>
           <button id="btnTokenClear" class="secondary" title="Clear stored token">Clear</button>
@@ -162,9 +163,18 @@ const showTokenPanel = ( reasonHtml = '' ) => {
   inp.focus();
   document.getElementById( 'inpTokenShow' ).addEventListener( 'change', ( e ) => { inp.type = e.target.checked ? 'text' : 'password'; } );
   const save = () => {
+    const error = document.getElementById( 'tokenSaveError' );
+    error.hidden = true;
+    error.textContent = '';
     const v = inp.value;
     if ( v === '' && hasToken ) return;   // blank = keep existing
-    try { localStorage.setItem( tokenStorageKey(), v ); } catch ( _ ) { /* storage disabled */ }
+    try {
+      localStorage.setItem( tokenStorageKey(), v );
+    } catch ( err ) {
+      error.textContent = `Unable to save token in browser storage: ${ err.message }`;
+      error.hidden = false;
+      return;
+    }
     clearFileCache();
     location.reload();
   };
@@ -320,7 +330,7 @@ const closeInfoPanel = () => {
   else autoSelectReadme();
 };
 
-const toggleInfoPanel = async ( panel ) => {
+const toggleInfoPanel = ( panel ) => {
   // No content area to render into (e.g. the standalone header component page) →
   // the ?/⚙️ buttons are inert rather than throwing. Mirrors showTokenPanel's guard,
   // but here it also avoids leaving the button stuck pressed + a broken close path.
@@ -331,7 +341,7 @@ const toggleInfoPanel = async ( panel ) => {
   state.currentFilePath = '';
   activePanel = panel;
   updateInfoButtonState();
-  if ( panel === 'about' ) await renderAboutPanel();
+  if ( panel === 'about' ) renderAboutPanel();
   else showTokenPanel();
 };
 

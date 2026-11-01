@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TooToo regression checks</title>
+</head>
+<body>
+  <p>Loading the assembled app for regression checks…</p>
+  <script>
+    // Open via file://. Add ?build=production to check the sibling repo's production
+    // build (../pushme-pullyou-tootoo/index.html) instead of the dev build beside this file.
+    // Load the real assembled app, replacing only its startup call with this runner.
+    // All GitHub/file responses below are fixtures; no token or private repo is used.
+    const runRegressions = async () => {
+      const results = [];
+      const testPrefix = 'tootoo-regression-' + Date.now();
+      window.TOOTOO_CONFIG = { storagePrefix: testPrefix };
+      CONFIG.storagePrefix = testPrefix;
+      const tick = () => new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+      const check = ( name, passed, detail = '' ) => results.push( { name, passed: !!passed, detail } );
+      const until = async ( predicate ) => {
+        for ( let i = 0; i < 100; i++ ) {
+          if ( predicate() ) return;
+          await new Promise( ( resolve ) => setTimeout( resolve, 10 ) );
+        }
+        throw new Error( 'Timed out waiting for navigation: ' + JSON.stringify( { branch: state.branch, path: state.currentFilePath, url: location.href, panel: activePanel } ) );
+      };
+      const setUrl = ( query, hash = '' ) => history.replaceState( null, '', location.pathname + '?' + query + hash );
+      const tree = [ { path: 'README.md', type: 'blob', size: 30 }, { path: 'next.txt', type: 'blob', size: 20 } ];
+      let head = 'ref: refs/heads/main';
+      const fixtureFetch = async ( url ) => {
+        const value = String( url );
+        if ( value === '.git/config' ) return new Response( '[remote "origin"]\nurl = https://github.com/local-owner/local-repo.git\n' );
+        if ( value === '.git/HEAD' ) return new Response( head );
+        if ( value.includes( '/git/trees/' ) ) return new Response( JSON.stringify( { tree } ) );
+        if ( value.includes( '/rate_limit' ) ) return new Response( JSON.stringify( { resources: { core: { remaining: 60, limit: 60, reset: 0 } } } ) );
+        if ( /^https:\/\/api\.github\.com\/repos\/[^/]+\/[^/?]+$/.test( value ) ) return new Response( JSON.stringify( { default_branch: 'main' } ) );
+        return new Response( '# Heading\n\n' + ( value.startsWith( './' ) ? 'LOCAL CONTENT' : 'REMOTE CONTENT' ) );
+      };
+      window.fetch = fixtureFetch;
+      try {
+        setUrl( 'owner=local-owner&repo=local-repo&branch=main' );
+        await initApp();
+        await until( () => !!document.querySelector( '#viewRendered h1' ) && parseHash().path === 'README.md' );
+        check( 'Startup renders a local README', document.querySelector( '#viewRendered h1' )?.textContent === 'Heading' );
+        check( 'Matching checkout uses disk', ( await fetchFileText( 'local-check.md' ) ).includes( 'LOCAL CONTENT' ) );
+
+        setUrl( 'owner=remote-owner&repo=remote-repo' );
+        await detectLocalMode(); await detectRepo();
+        check( 'Another repository does not inherit the local branch', state.branch === '' );
+        state.branch = await getDefaultBranch();
+        check( 'Another repository reads remote content', ( await fetchFileText( 'remote-check.md' ) ).includes( 'REMOTE CONTENT' ) );
+        check( 'Another repository uses remote media and New Tab URLs', !localUrlFor( 'image.png' ) && getNewTabUrl( 'image.png' ).startsWith( 'https:' ) );
+
+        head = 'ref: refs/heads/work/topic';
+        setUrl( 'owner=local-owner&repo=local-repo' );
+        await detectLocalMode(); await detectRepo();
+        check( 'Local startup selects the checked-out branch', state.branch === 'work/topic' && !!localUrlFor( 'README.md' ) );
+        await switchBranch( 'main' ); await until( () => parseHash().path === 'README.md' && document.getElementById( 'contentBody' ).textContent.includes( 'REMOTE CONTENT' ) );
+        check( 'Switching away from the checkout reads remote files', !localUrlFor( 'README.md' ) && document.getElementById( 'contentBody' ).textContent.includes( 'REMOTE CONTENT' ) );
+        await switchBranch( 'work/topic' ); await until( () => parseHash().path === 'README.md' && document.getElementById( 'contentBody' ).textContent.includes( 'LOCAL CONTENT' ) );
+        check( 'Switching back to the checkout restores local reads', document.getElementById( 'contentBody' ).textContent.includes( 'LOCAL CONTENT' ) );
+        head = 'a'.repeat( 40 );
+        setUrl( 'owner=local-owner&repo=local-repo' );
+        await detectLocalMode(); await detectRepo();
+        check( 'Detached checkout is matched by commit', state.branch === head && !!localUrlFor( 'README.md' ) );
+        head = '';
+        await detectLocalMode(); await detectRepo(); state.branch = 'main';
+        check( 'Unreadable checkout identity does not guess a local branch', localUrlFor( 'README.md' ) === null );
+        head = 'ref: refs/heads/main';
+        setUrl( 'owner=local-owner&repo=local-repo&branch=main' );
+        await detectLocalMode(); await detectRepo();
+        localMode = false; clearFileCache();
+
+        for ( const panel of [ 'token', 'about' ] ) {
+          let release, pendingSignal;
+          window.fetch = ( url, options = {} ) => String( url ).endsWith( '/slow-' + panel + '.txt' )
+            ? new Promise( ( resolve ) => { pendingSignal = options.signal; release = () => resolve( new Response( 'STALE FILE' ) ); } )
+            : fixtureFetch( url, options );
+          const pending = selectFile( 'slow-' + panel + '.txt' );
+          await tick(); await toggleInfoPanel( panel );
+          if ( panel === 'token' ) document.getElementById( 'inpToken' ).value = 'fixture-input';
+          release(); await pending;
+          check( 'Pending file cannot overwrite ' + panel, pendingSignal.aborted && activePanel === panel && document.getElementById( 'contentBody' ).textContent.indexOf( 'STALE FILE' ) === -1 && document.querySelector( '#contentArea .file-header' ).textContent === ( panel === 'token' ? 'GitHub Token' : 'About' ) );
+          if ( panel === 'token' ) check( 'Token form keeps typed input', document.getElementById( 'inpToken' )?.value === 'fixture-input' );
+        }
+        window.fetch = fixtureFetch;
+
+        for ( const fails of [ false, true ] ) {
+          delete window.XLSX;
+          let release, reject, waitingForLibrary = false;
+          const library = new Promise( ( resolve, fail ) => { release = resolve; reject = fail; } );
+          xlsxLoader = { then: ( resolve, fail ) => { waitingForLibrary = true; return library.then( resolve, fail ); } };
+          const pending = selectFile( fails ? 'failed.csv' : 'old.csv' );
+          await until( () => waitingForLibrary );
+          await selectFile( 'next.txt' );
+          const expected = document.getElementById( 'contentBody' ).innerHTML;
+          window.XLSX = { read: () => ( { SheetNames: [ 'Old sheet' ], Sheets: { 'Old sheet': {} } } ), utils: { sheet_to_html: () => '<table><tr><td>OLD DATA</td></tr></table>' } };
+          if ( fails ) reject( new Error( 'Late library failure' ) ); else release();
+          await pending; await tick();
+          check( 'Late spreadsheet ' + ( fails ? 'failure' : 'success' ) + ' cannot replace a newer file', document.getElementById( 'contentBody' ).innerHTML === expected && state.currentFilePath === 'next.txt' && parseHash().path === 'next.txt' );
+          check( 'Canceled spreadsheet cannot change the saved file', sessionStorage.getItem( getCurrentFileKey() ) === 'next.txt' );
+        }
+        delete window.XLSX; xlsxLoader = null;
+
+        renderMarkdown( '[Next](next.md?plain=1#heading)\n\n[Here](#heading)\n\n[Query](?plain=1#heading)\n\n# Heading', 'docs/start.md', newAbort() );
+        const links = document.querySelectorAll( '#viewRendered a' );
+        document.getElementById( 'btnHelp' ).focus(); links[ 0 ].focus();
+        check( 'Markdown links accept keyboard focus', document.activeElement === links[ 0 ] );
+        check( 'Markdown links expose a usable permalink', links[ 0 ].getAttribute( 'href' ) === '#docs/next.md#heading' );
+        check( 'Heading and query-only links retain the current file', links[ 1 ].getAttribute( 'href' ) === '#docs/start.md#heading' && links[ 2 ].getAttribute( 'href' ) === '#docs/start.md#heading' );
+        let intercepted;
+        links[ 0 ].addEventListener( 'click', ( e ) => { intercepted = e.defaultPrevented; e.preventDefault(); }, { once: true } );
+        links[ 0 ].dispatchEvent( new MouseEvent( 'click', { bubbles: true, cancelable: true, ctrlKey: true } ) );
+        check( 'Modified clicks retain the browser link action', intercepted === false );
+        links[ 0 ].click(); await until( () => state.currentFilePath === 'docs/next.md' && parseHash().anchor === 'heading' );
+        check( 'Ordinary link activation opens the file and anchor', state.currentFilePath === 'docs/next.md' && parseHash().anchor === 'heading' );
+        check( 'Queries are stripped before resolving paths', resolveRepoPath( '../next.md?plain=1#heading', 'docs/sub' ) === 'docs/next.md' );
+        check( 'Encoded filename punctuation remains intact', resolveRepoPath( 'a%3Fb%23c.md?plain=1', 'docs' ) === 'docs/a?b#c.md' );
+        check( 'Root-relative paths normalize parent segments', resolveRepoPath( '/docs/../next.md?plain=1', 'elsewhere' ) === 'next.md' );
+
+        for ( const ext of MARKDOWN_EXTS ) {
+          setPreferredView( ext, 'rendered' );
+          await selectFile( 'README.' + ext );
+          const toggle = document.querySelector( '[data-action="view-toggle"]' );
+          check( ext + ' renders Markdown with a toggle', !!document.querySelector( '#viewRendered h1' ) && !!toggle );
+          toggle.click();
+          check( ext + ' toggles to raw source', document.getElementById( 'viewRaw' ).style.display !== 'none' );
+          toggle.click();
+          check( ext + ' toggles back to rendered content', document.getElementById( 'viewRendered' ).style.display !== 'none' );
+        }
+        check( 'HTML aliases still share their preference', viewPrefKey( 'htm' ) === viewPrefKey( 'html' ) );
+
+        const unusual = [ 'constructor', '__proto__', 'toString' ].flatMap( ( name ) => [
+          { path: name, type: 'tree' }, { path: name + '/README.md', type: 'blob', size: 1 }
+        ] );
+        renderTree( unusual );
+        check( 'Prototype-like folder names render normally', document.querySelectorAll( '#treeList .tree-item' ).length === 3 );
+        for ( const hasSubfolder of [ false, true ] ) {
+          renderTree( [ { path: 'docs', type: 'tree' }, ...( hasSubfolder ? [ { path: 'docs/sub', type: 'tree' } ] : [] ), { path: hasSubfolder ? 'docs/sub/next.txt' : 'docs/next.txt', type: 'blob', size: 1 } ] );
+          const folder = document.querySelector( 'details[data-folder-path="docs"]' ); folder.open = true;
+          const summary = folder.querySelector( 'summary' ); summary.focus();
+          summary.dispatchEvent( new KeyboardEvent( 'keydown', { key: 'ArrowRight', bubbles: true, cancelable: true } ) );
+          check( 'Right Arrow enters the first ' + ( hasSubfolder ? 'subfolder' : 'file' ), hasSubfolder
+            ? document.activeElement.parentElement.dataset.folderPath === 'docs/sub'
+            : document.activeElement.dataset.path === 'docs/next.txt' );
+          await tick();
+        }
+
+        state.branch = 'feature#notes&more/topic';
+        const raw = new URL( rawUrl( 'README.md' ) );
+        const api = new URL( contentsApiUrl( 'README.md' ) );
+        check( 'Raw URL encodes the complete branch name', raw.hash === '' && raw.pathname.includes( encodeURIComponent( state.branch ) ) );
+        check( 'Contents API preserves the complete branch ref', api.hash === '' && api.searchParams.get( 'ref' ) === state.branch );
+        await switchBranch( 'main' ); await until( () => parseHash().path === 'README.md' && document.getElementById( 'contentBody' ).textContent.includes( 'REMOTE CONTENT' ) );
+        await selectFile( 'history-main.txt' ); await tick();
+        await selectFile( 'second-main.txt' ); await tick();
+        await switchBranch( 'feature#notes' ); await until( () => parseHash().path === 'README.md' && document.getElementById( 'contentBody' ).textContent.includes( 'REMOTE CONTENT' ) );
+        check( 'Branch switching updates the URL', new URLSearchParams( location.search ).get( 'branch' ) === 'feature#notes' );
+        await detectLocalMode(); await detectRepo();
+        check( 'Reload detection preserves the selected branch', state.branch === 'feature#notes' );
+        history.back();
+        await until( () => state.branch === 'main' && state.currentFilePath === 'history-main.txt' && parseHash().path === 'history-main.txt' );
+        check( 'Back restores the previous branch and file', true );
+        history.forward();
+        await until( () => state.branch === 'feature#notes' && state.currentFilePath === 'README.md' );
+        check( 'Forward restores the next branch and file', true );
+
+        // A second startup exercises opening a panel before the tree request completes.
+        let releaseTree, treeSignal;
+        window.fetch = ( url, options = {} ) => String( url ).includes( '/git/trees/' )
+          ? new Promise( ( resolve ) => { treeSignal = options.signal; releaseTree = () => resolve( new Response( JSON.stringify( { tree } ) ) ); } )
+          : fixtureFetch( url, options );
+        state.tree = null; state.currentFilePath = ''; activePanel = null;
+        setUrl( 'owner=local-owner&repo=local-repo&branch=main' );
+        const startup = initApp();
+        await until( () => !!releaseTree );
+        await toggleInfoPanel( 'about' );
+        check( 'Opening a panel does not cancel initial tree loading', !treeSignal.aborted );
+        releaseTree(); await startup; await tick();
+        check( 'Initial tree completion preserves the open panel', activePanel === 'about' && state.currentFilePath === '' && !!state.tree );
+      } catch ( err ) {
+        check( 'Runner completed', false, err.stack || err.message );
+      } finally {
+        cancelContentLoad();
+        revokeAllBlobUrls();
+        for ( const storage of [ localStorage, sessionStorage ] ) {
+          for ( const key of Object.keys( storage ) ) if ( key.startsWith( testPrefix + ':' ) ) storage.removeItem( key );
+        }
+      }
+      const failed = results.filter( ( r ) => !r.passed ).length;
+      document.title = `TooToo regression checks: ${ failed ? 'FAIL' : 'PASS' }`;
+      document.body.innerHTML = `<main style="display:block;overflow:auto;padding:1rem"><h1>${ results.length - failed } passed; ${ failed } failed</h1><p>Actual assembled app functions; controlled network responses.</p><pre id="regression-results" style="white-space:pre-wrap"></pre></main>`;
+      document.getElementById( 'regression-results' ).textContent = JSON.stringify( results, null, 2 );
+    };
+
+    ( async () => {
+      try {
+        const build = new URLSearchParams( location.search ).get( 'build' ) === 'production' ? '../pushme-pullyou-tootoo/index.html' : 'index.html';
+        const response = await fetch( build );
+        if ( !response.ok ) throw new Error( 'Cannot read ' + build );
+        const html = await response.text();
+        const startup = /^initApp\(\);[ \t]*\r?$/m;
+        if ( !startup.test( html ) ) throw new Error( 'Assembled startup call was not found' );
+        const fixture = html.replace( startup, () => 'window.addEventListener( "load", ' + runRegressions.toString() + ', { once: true } );' );
+        document.open(); document.write( fixture ); document.close();
+      } catch ( err ) {
+        document.body.textContent = 'Regression checks could not start: ' + err.message;
+      }
+    } )();
+  </script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="revised" content="2026-07-06 12:05">
+  <title>TooToo — Header (dev)</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    /* Page-only scaffolding. Ignored by the assembler (outside @part). */
+    .dev-note {
+      margin: 1rem;
+      padding: 0.75rem 1rem;
+      border: 1px dashed var(--border-color);
+      border-radius: 8px;
+      background: var(--secondary-bg);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .dev-note code {
+      background: var(--hover-bg);
+      padding: 0 0.25rem;
+      border-radius: 4px;
+    }
+
+    .dev-controls {
+      margin: 0 1rem 1rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--secondary-bg);
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 0.5rem 0.75rem;
+      align-items: center;
+      max-width: 480px;
+    }
+
+    .dev-controls h2 {
+      grid-column: 1 / -1;
+      margin: 0 0 0.25rem;
+      font-size: 1rem;
+    }
+
+    .dev-controls label {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    .dev-controls input {
+      font: inherit;
+      padding: 0.2rem 0.4rem;
+    }
+
+    .dev-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+      margin: 0 1rem 0.5rem;
+    }
+
+    .dev-presets span {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    .dev-presets button {
+      font: inherit;
+      font-size: 0.85rem;
+      padding: 0.2rem 0.6rem;
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      background: var(--secondary-bg);
+      cursor: pointer;
+    }
+
+    .dev-presets button:hover {
+      border-color: var(--highlight-color);
+      color: var(--highlight-color);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- @part:header:start -->
+  <header>
+    <button id="btnToggleSidebar" class="header-btn" title="Close sidebar (Ctrl/⌘ B)" aria-label="Toggle sidebar"
+      aria-controls="sidebar" aria-expanded="true">☰</button>
+    <a id="headerGitHub" href="." title="View on GitHub" aria-label="View on GitHub">
+      <!-- App brand mark: the deployment's favicon.ico (static; the standalone
+           harness rewrites the src to ../../favicon.ico). aria-hidden: the anchor's
+           aria-label names the link. -->
+      <img id="headerBrand" src="favicon.ico" width="18" height="18" alt="" aria-hidden="true">
+    </a>
+
+    <a id="headerTitle" href="." title="Reload" aria-label="Reload page">TooToo</a>
+
+    <!-- Branch switcher: hidden in markup until branches load, then sidebar.js fills
+         #branchName + the menu and unhides it (header markup, sidebar.js owns the
+         behavior). The dev harness below toggles it standalone for preview. -->
+    <span class="branch-control">
+      <button id="btnBranch" class="branch-switcher" type="button" hidden aria-haspopup="listbox" aria-expanded="false"
+        title="Switch branch">
+        <span class="branch-glyph" aria-hidden="true">⎇</span>
+        <span id="branchName"></span>
+        <span class="branch-caret" aria-hidden="true">▾</span>
+      </button>
+      <div id="branchMenu" class="branch-menu" role="listbox" aria-label="Branches" hidden></div>
+    </span>
+
+    <!-- ⌂ hub link: hidden unless CONFIG.homeUrl is set (header.js wires it at init) -->
+    <a id="headerHome" class="header-btn" hidden title="Home" aria-label="Home page">⌂</a>
+
+    <span id="headerSubtitle" class="header-subtitle" hidden></span>
+
+    <button id="btnDarkMode" class="header-btn dark-mode-btn" title="Toggle Dark Mode"
+      aria-label="Toggle dark mode" aria-pressed="false">🌙</button>
+    <button id="btnFontDec" class="header-btn" title="Decrease Font Size" aria-label="Decrease font size">A−</button>
+    <button id="btnFontInc" class="header-btn" title="Increase Font Size" aria-label="Increase font size">A+</button>
+    <button id="btnHelp" class="header-btn" title="About this app" aria-label="About this app"
+      aria-pressed="false">?</button>
+    <button id="btnToken" class="header-btn" title="GitHub API rate limit — click to set a token"
+      aria-label="Set GitHub personal access token" aria-pressed="false">⚙️</button>
+    <div id="rateBadge" class="rate-limit-badge" title="API Rate Limit" aria-live="polite"></div>
+  </header>
+  <!-- @part:header:end -->
+
+  <div class="dev-note">
+    🧪 <strong>Standalone header component.</strong> The real header bar, driven by
+    <code>js/header.js</code> reading <code>state</code>/<code>CONFIG</code> (mock) + <code>meta[revised]</code>.
+    Try 🌙 / A− / A+ and hover the title for the tooltip. Click <strong>Load example</strong>
+    to swap in a real repo's identity, or use the controls below to mutate repo identity +
+    appearance live. (? / ⚙️ are inert here — their panels need a content area this page omits.)
+  </div>
+
+  <div class="dev-presets" id="devPresets">
+    <span>Load example:</span>
+  </div>
+
+  <div class="dev-controls">
+    <h2>🎛️ Header preview settings</h2>
+    <label for="ctlOwner">owner</label>
+    <input id="ctlOwner" type="text" placeholder="e.g. pushme-pullyou">
+    <label for="ctlRepo">repo</label>
+    <input id="ctlRepo" type="text" placeholder="e.g. tootoo">
+    <label for="ctlBranch">branch</label>
+    <input id="ctlBranch" type="text" placeholder="e.g. main">
+    <label for="ctlSubtitle">subtitle</label>
+    <input id="ctlSubtitle" type="text" placeholder="(empty)">
+    <label for="ctlColor">themeColor</label>
+    <input id="ctlColor" type="color">
+    <label for="ctlAppName">appName</label>
+    <input id="ctlAppName" type="text" placeholder="shown when owner+repo empty">
+    <label for="ctlSource">sourceRepoUrl</label>
+    <input id="ctlSource" type="url" placeholder="https://github.com/…">
+    <label for="ctlFontUrl">headingFontUrl</label>
+    <input id="ctlFontUrl" type="url" placeholder="Google Fonts / .woff2 URL">
+    <label for="ctlFont">headingFont</label>
+    <input id="ctlFont" type="text" placeholder='e.g. "Patua One", serif'>
+  </div>
+
+  <div class="dev-presets" id="devFonts">
+    <span>Heading font:</span>
+  </div>
+
+  <!-- Component dependencies. -->
+  <script src="../js/core.js"></script>
+  <script src="../mock/mock-data.js"></script>
+  <script src="../js/header.js"></script>
+
+  <!-- Dev harness: seed control values, then mutate CONFIG + re-render. -->
+  <script>
+    const byId = ( id ) => document.getElementById( id );
+
+    initHeader();
+    // Standalone page: the brand mark's static src="favicon.ico" resolves relative to
+    // this file (src/components/), so point it at the dev folder's generated one.
+    byId( 'headerBrand' ).src = '../../favicon.ico';
+    byId( 'ctlOwner' ).value = state.owner || CONFIG.owner || '';
+    byId( 'ctlRepo' ).value = state.repo || CONFIG.repo || '';
+    byId( 'ctlBranch' ).value = state.branch || CONFIG.branch || '';
+    byId( 'ctlSubtitle' ).value = CONFIG.subtitle || '';
+    // Default to the live --highlight-color from styles.css (one source of truth)
+    // rather than a hard-coded hex; initAppearance has already applied it.
+    byId( 'ctlColor' ).value = CONFIG.themeColor ||
+      getComputedStyle( document.documentElement ).getPropertyValue( '--highlight-color' ).trim() || '#2563eb';
+    byId( 'ctlAppName' ).value = CONFIG.appName || '';
+    byId( 'ctlSource' ).value = CONFIG.sourceRepoUrl || '';
+    byId( 'ctlFontUrl' ).value = CONFIG.headingFontUrl || '';
+    byId( 'ctlFont' ).value = CONFIG.headingFont || '';
+
+    const reflectConfig = ( id, key ) => byId( id ).addEventListener( 'input', ( e ) => {
+      CONFIG[ key ] = e.target.value; updateHeaderFromConfig();
+    } );
+
+    // sourceRepoUrl is wired into #headerGitHub once at init (header.js), so mirror
+    // it onto the href directly — updateHeaderFromConfig doesn't touch the link.
+    const reflectSource = () => byId( 'ctlSource' ).addEventListener( 'input', ( e ) => {
+      CONFIG.sourceRepoUrl = e.target.value;
+      byId( 'headerGitHub' ).setAttribute( 'href', e.target.value || '#' );
+    } );
+
+    // headingFont sets --heading-font (consumed by #headerTitle + h1–h6 CSS);
+    // empty clears it so the var falls back to the body font.
+    const reflectHeadingFont = () => byId( 'ctlFont' ).addEventListener( 'input', ( e ) => {
+      const value = e.target.value;
+      CONFIG.headingFont = value;
+      const root = document.documentElement.style;
+      if ( value ) root.setProperty( '--heading-font', value );
+      else root.removeProperty( '--heading-font' );
+    } );
+
+    // headingFontUrl loads a stylesheet. Reuse a single <link> (vs. core.js's
+    // applyHeadingFont, which appends a fresh one each call) so live edits don't
+    // pile up stale font links in the dev page's <head>.
+    const reflectFontUrl = () => byId( 'ctlFontUrl' ).addEventListener( 'input', ( e ) => {
+      const value = e.target.value.trim();
+      CONFIG.headingFontUrl = value;
+      let link = byId( 'devHeadingFontLink' );
+      if ( !value ) { link?.remove(); return; }
+      if ( !link ) {
+        link = document.createElement( 'link' );
+        link.id = 'devHeadingFontLink';
+        link.rel = 'stylesheet';
+        document.head.appendChild( link );
+      }
+      link.href = value;
+    } );
+
+    const reflectState = ( id, key ) => byId( id ).addEventListener( 'input', ( e ) => {
+      const value = e.target.value.trim();
+      state[ key ] = value;
+      CONFIG[ key ] = value;
+      updateHeaderFromConfig();
+      syncBranchChip();
+    } );
+
+    const syncBranchChip = () => {
+      const branch = state.branch || CONFIG.branch || '';
+      const btn = byId( 'btnBranch' );
+      const name = byId( 'branchName' );
+      if ( !btn || !name ) return;
+      if ( !branch ) {
+        btn.hidden = true;
+        name.textContent = '';
+        return;
+      }
+      name.textContent = branch;
+      btn.hidden = false;
+      btn.title = `Branch: ${ branch } — click to switch`;
+      btn.setAttribute( 'aria-label', `Branch ${ branch } — click to switch` );
+    };
+
+    reflectState( 'ctlOwner', 'owner' );
+    reflectState( 'ctlRepo', 'repo' );
+    reflectState( 'ctlBranch', 'branch' );
+    reflectConfig( 'ctlSubtitle', 'subtitle' );
+    reflectConfig( 'ctlColor', 'themeColor' );
+    reflectConfig( 'ctlAppName', 'appName' );
+    reflectSource();
+    reflectHeadingFont();
+    reflectFontUrl();
+    syncBranchChip();
+
+    // The harness doesn't load main.js (so applyHeadingFont never runs), yet the
+    // controls are seeded from CONFIG.headingFont. Apply that seed through the managed
+    // -link path so the preview matches the panel — not a raw applyHeadingFont(), which
+    // would append an unmanaged <link> and reintroduce the stale-link pileup.
+    byId( 'ctlFontUrl' ).dispatchEvent( new Event( 'input' ) );
+    byId( 'ctlFont' ).dispatchEvent( new Event( 'input' ) );
+
+    // ── Example presets: one click fills every control with a real repo's
+    // identity + branding. Each field is set then fired through the existing
+    // 'input' handlers, so the header re-renders just as if it were typed. ──
+    const PRESETS = [
+      {
+        name: 'TooToo',
+        owner: 'pushme-pullyou', repo: 'tootoo', branch: 'main',
+        appName: 'TooToo', subtitle: 'Single-file GitHub repository browser',
+        themeColor: '#3a8856', sourceRepoUrl: 'https://github.com/pushme-pullyou/tootoo',
+        headingFontUrl: 'https://fonts.googleapis.com/css2?family=Patua+One&display=swap',
+        headingFont: '"Patua One", serif',
+      },
+      {
+        name: 'React',
+        owner: 'facebook', repo: 'react', branch: 'main',
+        appName: 'React', subtitle: 'A library for web and native user interfaces',
+        themeColor: '#149eca', sourceRepoUrl: 'https://github.com/facebook/react',
+        headingFontUrl: '', headingFont: '',
+      },
+      {
+        name: 'Linux',
+        owner: 'torvalds', repo: 'linux', branch: 'master',
+        appName: 'Linux', subtitle: 'Linux kernel source tree',
+        themeColor: '#d4a017', sourceRepoUrl: 'https://github.com/torvalds/linux',
+        headingFontUrl: 'https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap',
+        headingFont: '"Courier Prime", monospace',
+      },
+      {
+        name: 'VS Code',
+        owner: 'microsoft', repo: 'vscode', branch: 'main',
+        appName: 'VS Code', subtitle: 'Code editing. Redefined.',
+        themeColor: '#007acc', sourceRepoUrl: 'https://github.com/microsoft/vscode',
+        headingFontUrl: '', headingFont: '',
+      },
+    ];
+
+    const applyPreset = ( p ) => {
+      const set = ( id, value ) => {
+        const el = byId( id );
+        // <input type=color> can't hold '' (it snaps to #000000), so leave the
+        // swatch unchanged when a preset omits the color rather than forcing black.
+        if ( el.type === 'color' && !value ) return;
+        el.value = value || '';
+        el.dispatchEvent( new Event( 'input', { bubbles: true } ) );
+      };
+      set( 'ctlOwner', p.owner );
+      set( 'ctlRepo', p.repo );
+      set( 'ctlBranch', p.branch );
+      set( 'ctlSubtitle', p.subtitle );
+      set( 'ctlColor', p.themeColor );
+      set( 'ctlAppName', p.appName );
+      set( 'ctlSource', p.sourceRepoUrl );
+      set( 'ctlFontUrl', p.headingFontUrl );
+      set( 'ctlFont', p.headingFont );
+    };
+
+    const presetBar = byId( 'devPresets' );
+    PRESETS.forEach( ( p ) => {
+      const btn = document.createElement( 'button' );
+      btn.type = 'button';
+      btn.textContent = p.name;
+      btn.title = `${ p.owner }/${ p.repo } @ ${ p.branch }`;
+      btn.addEventListener( 'click', () => applyPreset( p ) );
+      presetBar.appendChild( btn );
+    } );
+
+    // ── Quick heading-font swatches: each button just drives the headingFont +
+    // headingFontUrl controls (via their 'input' handlers). 'None' clears both to
+    // prove the system-font fallback. Buttons render in their own face once loaded. ──
+    const FONTS = [
+      { name: 'Fraunces', headingFont: '"Fraunces", serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&display=swap' },
+      { name: 'Space Grotesk', headingFont: '"Space Grotesk", sans-serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&display=swap' },
+      { name: 'Bitter', headingFont: '"Bitter", serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Bitter:wght@600&display=swap' },
+      { name: 'Sigmar', headingFont: '"Sigmar", sans-serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Sigmar&display=swap' },
+      { name: 'Rammetto One', headingFont: '"Rammetto One", sans-serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Rammetto+One&display=swap' },
+      { name: 'None', headingFont: '', headingFontUrl: '' },
+    ];
+    const applyFont = ( f ) => {
+      const fire = ( id, value ) => {
+        const el = byId( id );
+        el.value = value;
+        el.dispatchEvent( new Event( 'input', { bubbles: true } ) );
+      };
+      fire( 'ctlFontUrl', f.headingFontUrl );
+      fire( 'ctlFont', f.headingFont );
+    };
+    const fontBar = byId( 'devFonts' );
+    FONTS.forEach( ( f ) => {
+      const btn = document.createElement( 'button' );
+      btn.type = 'button';
+      btn.textContent = f.name;
+      if ( f.headingFont ) btn.style.fontFamily = f.headingFont;   // preview the face on the button itself
+      btn.addEventListener( 'click', () => applyFont( f ) );
+      fontBar.appendChild( btn );
+    } );
+  </script>
+
+</body>
+
+</html>

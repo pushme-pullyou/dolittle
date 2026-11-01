@@ -148,10 +148,26 @@ header {
   transition: color 0.15s, background-color 0.15s;
 }
 
-#headerTitle:hover {
-  color: var(--highlight-color);
+/* header title segments are live links; each highlights on its own (the slash
+   between them keeps the title's click-to-reset) */
+#headerTitle a {
+  border-radius: 6px;
+  color: inherit;
+  padding: 0.05rem 0.35rem;
+  text-decoration: none;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+#headerTitle a:hover {
   background: color-mix(in srgb, var(--highlight-color), transparent 85%);
+  color: var(--highlight-color);
   text-decoration: underline;
+}
+
+/* a visible break between the two links */
+.title-sep {
+  margin: 0 0.35rem;
+  opacity: 0.5;
 }
 
 .header-subtitle {
@@ -304,6 +320,7 @@ main {
   padding: 0;
   overflow: hidden;
   container-type: inline-size;
+  position: relative;   /* anchors the floating #btnTreeTop over the tree */
 }
 
 @container (max-width: 220px) {
@@ -678,6 +695,20 @@ details {
   cursor: pointer;
   align-items: center;
   justify-content: center;
+}
+
+/* the sidebar's ↑ shares .back-to-top's look; this modifier shrinks it and floats
+   it over the tree, just above the sidebar footer */
+.panel-to-top {
+  font-size: 1rem;
+  height: 1.9rem;
+  width: 1.9rem;
+}
+
+#btnTreeTop {
+  position: absolute;
+  bottom: 2.6rem;
+  right: 0.9rem;
 }
 
 /* ── Content Viewer ── */

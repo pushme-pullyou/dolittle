@@ -2,6 +2,29 @@
 
 ## 2026-10-31
 
+* **Hub harvest** — ported five general-purpose features from Theo's TooToo Hub build
+  (`theo-armour.github.io`, 2026-10-26) into the canonical sources, generalized for
+  arbitrary repos (the Hub could assume one owner with Pages everywhere; canonical
+  uses a new `repoHasPages()` — Pages URLs only for `<owner>.github.io` repos, the
+  repo the app is served from, or installs that set the new `preferPagesUrls` knob):
+  1. Header title segments are live links (owner → github.com or the owner's site,
+     repo → its Pages site when known, else github.com); the slash between them and
+     the title background keep the click-to-reset.
+  2. New Tab opens a viewable file's live Pages copy when the repo is known to have
+     one; downloads keep the raw URL.
+  3. New `hideDatedBackups` config knob — hides `name-2026-10-24…` backup snapshots
+     from the tree (date-first blog posts unaffected). Off by default.
+  4. Floating ↑ button over the file tree, appearing after 150 px of scroll.
+  5. Markdown iframes, safely: `MD_PURIFY` now admits `<iframe>` and a DOMPurify
+     `afterSanitizeAttributes` hook re-sandboxes every frame (no `allow-same-origin`
+     on the origins where the token lives), lazy-loads them, resolves relative `src`
+     per repo (local file in drop-in mode, else Pages/raw), and drops `http:`/`data:`
+     sources. Not ported (GubGub seeds): repo shelf, `ta-data.js`, private-repo
+     merge, organizations row, `@@@` reveal blocks.
+  Verified: 52/52 browser regressions, 27/27 helper tests, headless screenshot of the
+  dev build showing the linked header over the local checkout. Not yet promoted —
+  production and install docs (README knobs) update at the next `promote`.
+
 * Workshop named **Dolittle** (repo `dolittle`), after the Doctor who talks to the
   animals; the release pipeline is cast as **Pushme-Pullyou**, the two-headed animal
   that talks to and hears from GitHub. `0-tootoo-*` files renamed `0-dolittle-*`.

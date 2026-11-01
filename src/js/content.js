@@ -80,7 +80,47 @@ const buildToggleHtml = ( ext, renderedHtml, rawText, { prefix = '', renderedCla
     `<pre id="viewRaw" style="${ rawDisplay }">${ escapeHTML( rawText ) }</pre>`;
 };
 
-const MD_PURIFY = { FORBID_TAGS: [ 'style', 'form', 'button', 'textarea', 'select' ], FORBID_ATTR: [ 'style' ] };
+const MD_PURIFY = { ADD_TAGS: [ 'iframe' ], ADD_ATTR: [ 'allow', 'allowfullscreen' ], FORBID_TAGS: [ 'style', 'form', 'button', 'textarea', 'select' ], FORBID_ATTR: [ 'style' ] };
+
+/* ── iframes in markdown: whatever sandbox the author wrote is replaced by a safe one.
+   Done INSIDE the sanitizer because a frame's sandbox is fixed when it starts loading —
+   changing it after insertion is too late. Frames on the origins where the GitHub token
+   lives (this page, the home owner's github.io) get scripts but never same-origin, so
+   they can't read the token; frames from other sites (YouTube, maps…) keep their own
+   origin, which they need to work and which can't reach this app's storage anyway.
+   https sources load as written; relative ones are held back and resolved per repo by
+   renderMarkdown; anything else (http:, data:, javascript:) is dropped. ── */
+const FRAME_SANDBOX = 'allow-scripts allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox';
+const tokenOrigins = () => [ location.origin, `https://${ ( homeRepo.owner || CONFIG.owner ).toLowerCase() }.github.io` ];
+
+if ( window.DOMPurify ) DOMPurify.addHook( 'afterSanitizeAttributes', ( node ) => {
+  if ( node.tagName !== 'IFRAME' ) return;
+  node.setAttribute( 'sandbox', FRAME_SANDBOX );
+  node.setAttribute( 'loading', 'lazy' );
+  const src = ( node.getAttribute( 'src' ) || '' ).trim();
+  if ( /^https:\/\//i.test( src ) ) {
+    let origin = '';
+    try { origin = new URL( src ).origin; } catch ( _ ) { /* malformed → stays fully sandboxed */ }
+    if ( origin && !tokenOrigins().includes( origin ) ) node.setAttribute( 'sandbox', FRAME_SANDBOX + ' allow-same-origin' );
+    return;
+  }
+  node.removeAttribute( 'src' );
+  if ( src && !/^[a-z][\w+.-]*:/i.test( src ) && !src.startsWith( '//' ) ) node.setAttribute( 'data-repo-src', src );
+} );
+
+/* ── give a held-back relative iframe its real address: the local file in drop-in mode
+   (unsandboxed, the same rule as renderHtml — over file:// the sandbox protects nothing
+   and blocks the page's own neighbouring files), else the repo's published Pages copy
+   when the repo is known to have one, else the raw URL (shows source rather than nothing).
+   Any ?query/#hash on the original src is kept. ── */
+const setRepoFrameSrc = ( frame, currentDir ) => {
+  const raw = frame.dataset.repoSrc;
+  const suffix = raw.match( /[?#].*$/ )?.[ 0 ] || '';
+  const path = resolveRepoPath( raw, currentDir );
+  const local = localUrlFor( path );
+  if ( local ) frame.removeAttribute( 'sandbox' );
+  frame.src = ( local || ( repoHasPages() ? pagesUrl( path ) : rawUrl( path ) ) ) + suffix;
+};
 
 const renderMarkdown = ( text, filePath, signal, anchor = '' ) => {
   let renderedHtml, errorHtml = '';
@@ -161,6 +201,9 @@ const renderMarkdown = ( text, filePath, signal, anchor = '' ) => {
     try { img.setAttribute( 'src', await resolveMediaUrl( resolveRepoPath( clean, currentDir ), signal ) ); }
     catch ( _ ) { /* repo image missing/private fetch failed — or aborted by navigation */ }
   } );
+
+  // Relative iframes the sanitizer held back: point each at its repo file.
+  mdBody.querySelectorAll( 'iframe[data-repo-src]' ).forEach( ( frame ) => setRepoFrameSrc( frame, currentDir ) );
 
   mdBody.querySelectorAll( 'pre code' ).forEach( ( el ) => {
     try { hljs.highlightElement( el ); } catch ( _ ) { /* plain fallback */ }

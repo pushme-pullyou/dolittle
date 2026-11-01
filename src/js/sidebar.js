@@ -637,6 +637,24 @@ const initSidebar = () => {
   document.getElementById( 'btnScrollTreeTop' )?.addEventListener( 'click', () =>
     document.getElementById( 'treeList' ).scrollTo( { top: 0, behavior: 'smooth' } ) );
 
+  // Floating ↑ over the tree, like the content area's: appears once the tree has
+  // scrolled a bit, returns it to the top.
+  const treeList = document.getElementById( 'treeList' );
+  const treeTop = document.getElementById( 'btnTreeTop' );
+  if ( treeList && treeTop ) {
+    let shown = false;   // write style only on show/hide transitions, not every scroll frame
+    treeList.addEventListener( 'scroll', () => {
+      const want = treeList.scrollTop > 150;
+      if ( want === shown ) return;
+      shown = want;
+      treeTop.style.display = want ? 'flex' : 'none';
+    } );
+    treeTop.addEventListener( 'click', ( e ) => {
+      e.stopPropagation();
+      treeList.scrollTo( { top: 0, behavior: 'smooth' } );
+    } );
+  }
+
   // Resizer drag (real app does this in setupListeners; minimal version here).
   const resizer = document.getElementById( 'resizer' );
   if ( resizer ) {

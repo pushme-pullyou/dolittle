@@ -16,6 +16,8 @@ const CONFIG = {
   homeUrl: '',               // when set, the header shows a ⌂ link to this hub page
   storagePrefix: 'tootoo',
   hiddenFolders: [], hiddenFiles: [ 'tootoo.config.js' ],
+  hideDatedBackups: false,     // hide "name-2026-10-24…" backup snapshots from the tree (date-FIRST names stay)
+  preferPagesUrls: false,      // this install's owner serves every repo on GitHub Pages → New Tab / header links use the live sites
   autoOpenFolderReadme: true,  // expanding a folder opens its own README the first time (set false to disable)
   // Footer rights line appended after "© <year> <owner>". rightsOwners scopes WHICH
   // owners it shows for: null = every repo (default), an array = only those owner logins
@@ -91,11 +93,17 @@ const hiddenFileSet = () => new Set( ( CONFIG.hiddenFiles || [] ).map( ( s ) => 
 /* Dotfiles/dotfolders and CONFIG-hidden names are dropped from the sidebar. A hiddenFiles
    entry hides that bare name wherever it appears, unless it starts with '/', which anchors
    it to the repo root — so '/index.html' hides only the root file, not nested ones. */
+
+/* A date AFTER a name marks a backup snapshot ("index-2026-10-24….html",
+   "README 2026 09 18.md"); a date at the START is content ("2026-01-04-essay.md"). */
+const DATED_BACKUP_RE = /^.+20\d\d[-_ .]\d\d/;
+
 const isVisibleTreeItem = ( item, folders, files ) => {
   const parts = item.path.split( '/' );
   if ( parts.some( ( p ) => p.startsWith( '.' ) || folders.has( p.toLowerCase() ) ) ) return false;
   if ( item.type !== 'blob' ) return true;
   const name = parts[ parts.length - 1 ].toLowerCase();
+  if ( CONFIG.hideDatedBackups && DATED_BACKUP_RE.test( name ) ) return false;
   return !( files.has( name ) || files.has( '/' + item.path.toLowerCase() ) );
 };
 
@@ -461,9 +469,33 @@ const resolveRepoPath = ( href, currentDir ) => {
   return stack.join( '/' );
 };
 
-/* ── URL to open in a new tab / download (reference §31, simplified): the local
-   file in drop-in mode, else the raw GitHub URL (text/images view, binaries download). ── */
-const getNewTabUrl = ( path ) => localUrlFor( path ) || rawUrl( path );
+/* ── GitHub Pages addresses — so New Tab runs a page instead of showing source (the
+   Rendered/Raw toggle covers reading code). The special <owner>.github.io repo serves
+   from the domain root. Used only when Pages is a safe bet (repoHasPages). ── */
+const ownerSiteUrl = () => `https://${ encodeURIComponent( state.owner.toLowerCase() ) }.github.io`;
+const pagesBase = () => state.repo.toLowerCase() === `${ state.owner.toLowerCase() }.github.io`
+  ? ownerSiteUrl()
+  : `${ ownerSiteUrl() }/${ encodeURIComponent( state.repo ) }`;
+const pagesUrl = ( path ) => `${ pagesBase() }/${ encodePath( path ) }`;
+
+/* Positive evidence the browsed repo is published on Pages: it's an <owner>.github.io
+   site repo, it's the repo this app is itself served from on github.io, or the install
+   asserts it for every repo it browses (CONFIG.preferPagesUrls — single-owner hubs). */
+const repoHasPages = () => !!state.owner && !!state.repo && (
+  CONFIG.preferPagesUrls
+  || state.repo.toLowerCase() === `${ state.owner.toLowerCase() }.github.io`
+  || ( location.origin + location.pathname ).toLowerCase().startsWith( pagesBase().toLowerCase() + '/' ) );
+
+/* ── URL to open in a new tab / download: the local file in drop-in mode; downloads
+   keep the raw URL (direct save); viewable files open the live GitHub Pages copy
+   when the repo is known to have one, else the raw URL. ── */
+const getNewTabUrl = ( path ) => {
+  const local = localUrlFor( path );
+  if ( local ) return local;
+  const ext = extOf( path );
+  const willDownload = isDownloadAction( ext ) && !isTextOpenAsPlain( ext );
+  return ( !willDownload && repoHasPages() ) ? pagesUrl( path ) : rawUrl( path );
+};
 
 const getDefaultBranch = async ( signal ) => {
   const data = await ghApi( `https://api.github.com/repos/${ encodeURIComponent( state.owner ) }/${ encodeURIComponent( state.repo ) }`, signal );

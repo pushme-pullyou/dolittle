@@ -31,9 +31,19 @@ const updateHeaderFromConfig = () => {
   const subtitleEl = document.getElementById( 'headerSubtitle' );
   document.title = CONFIG.subtitle ? `${ label } · ${ CONFIG.subtitle }` : label;
   // Render owner / repo as two nowrap segments so a narrow header can wrap at the
-  // slash (either side) instead of forcing one long unbreakable line.
+  // slash (either side) instead of forcing one long unbreakable line. Each segment is
+  // a live link — owner/repo can arrive from the URL (?owner=…) so they are untrusted:
+  // the URL helpers percent-encode them and every attribute is HTML-escaped. The repo
+  // links to its Pages site only on positive evidence (repoHasPages), else github.com;
+  // clicking the slash or the gaps still resets to home (see initHeaderControls).
   if ( state.owner && state.repo ) {
-    titleEl.innerHTML = `<span class="title-seg">${ escapeHTML( state.owner ) }</span> / <span class="title-seg">${ escapeHTML( state.repo ) }</span>`;
+    const ownerSite = CONFIG.preferPagesUrls ? ownerSiteUrl() : `https://github.com/${ encodeURIComponent( state.owner ) }`;
+    const repoSite = repoHasPages() ? pagesBase()
+      : `https://github.com/${ encodeURIComponent( state.owner ) }/${ encodeURIComponent( state.repo ) }`;
+    titleEl.innerHTML =
+      `<a class="title-seg" href="${ escapeHTML( ownerSite ) }" target="_blank" rel="noopener" title="${ escapeHTML( ownerSite ) }">${ escapeHTML( state.owner ) }</a>` +
+      `<span class="title-sep">/</span>` +
+      `<a class="title-seg" href="${ escapeHTML( repoSite ) }" target="_blank" rel="noopener" title="${ escapeHTML( repoSite ) }">${ escapeHTML( state.repo ) }</a>`;
   } else {
     titleEl.textContent = CONFIG.appName;
   }
@@ -94,7 +104,10 @@ const initHeaderControls = () => {
   document.getElementById( 'btnToggleSidebar' )?.addEventListener( 'click', toggleSidebar );
 
   // Header title → reset to the home repo: clear hash/query, cached repo, last file.
+  // The owner/repo segments are live links — their clicks pass through untouched;
+  // only the slash between them and the title's background reset.
   document.getElementById( 'headerTitle' )?.addEventListener( 'click', ( e ) => {
+    if ( e.target.closest( 'a' ) ) return;
     e.preventDefault();
     clearCurrentFile();
     try { localStorage.removeItem( repoCacheKey() ); } catch ( _ ) { /* storage off */ }
@@ -256,7 +269,7 @@ const renderAboutPanel = () => {
       <h3>Tips</h3>
       <ul>
         <li>Use the filter input in the sidebar to search file names</li>
-        <li>Click the title in the header to reload</li>
+        <li>The owner and repo names in the header are links to their live sites; click the slash between them to reload</li>
         <li>Use <strong>A−</strong> / <strong>A+</strong> to adjust font size — helpful on phones and small screens</li>
         <li>Click <strong>🌙</strong> to toggle dark mode — your choice is saved across visits</li>
         <li>Click <strong>?</strong> or <strong>⚙️ Token</strong> again to close the panel and return to your file</li>

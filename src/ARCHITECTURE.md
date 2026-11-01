@@ -1,9 +1,13 @@
-# TooToo Dev — Architecture
+# TooToo — Component Architecture
 
 How the component-based TooToo is organized. Status: **implemented** — this describes the
-live `src/` layout of the workshop repo (drafted 2026-06-21 as `tootoo-dev/`; graduated to
-canonical 2026-06-23; moved to its own repo 2026-10-31). It is the source `index.html` is
-assembled from, not a proposal.
+live `src/` layout of the Dolittle workshop repo (drafted 2026-06-21 as `tootoo-dev/`;
+graduated to canonical 2026-06-23; moved to its own repo 2026-10-31). It is the source
+every TooToo `index.html` is assembled from, not a proposal.
+
+Throughout, **§ numbers** refer to the numbered sections of
+[`../tootoo-reference.html`](../tootoo-reference.html) — the frozen pre-carve single-file
+app these components were extracted from.
 
 ## Layers
 
@@ -90,10 +94,17 @@ Each component: a **mission**, the **DOM** it owns, what state it **writes** vs
 src/
   index.template.html   skeleton with @include markers
   styles.css            shared (base tokens + per-component sections appended)
+  config.js             dev config — bakes a default repo + dev identity for standalone testing
+  config.prod.js        empty production config — keeps the shipped build neutral
   components/  header.html  sidebar.html  content.html  footer.html
   js/          core.js  header.js  sidebar.js  content.js  footer.js  main.js
   mock/        mock-data.js   (sample CONFIG, state, tree, file blob)
 ```
+
+`../assemble.ps1` stitches this into a single file — two outputs, differing only by the
+config block: the **dev build** (`../index.html`, includes `config.js`) and the
+**production build** (`-Prod`, includes `config.prod.js`, written to the sibling
+`pushme-pullyou-tootoo` repo). See [`../PIPELINE.md`](../PIPELINE.md).
 
 Each `components/*.html` page mocks **exactly the state slice it reads** — so the
 page is a runnable copy of that component's contract. If a page has to mock a

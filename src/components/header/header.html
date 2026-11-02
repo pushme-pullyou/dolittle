@@ -61,87 +61,79 @@
       padding-bottom: 1rem;
     }
 
-    .dev-controls {
-      margin: 0 1rem 1rem;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      background: var(--secondary-bg);
-      display: grid;
-      grid-template-columns: max-content 1fr;
-      gap: 0.5rem 0.75rem;
-      align-items: center;
-      max-width: 480px;
+    .dev-settings-note,
+    #devConfigStatus {
+      margin: 0 0 1rem;
     }
 
-    .dev-controls h2 {
-      grid-column: 1 / -1;
-      margin: 0 0 0.25rem;
-      font-size: 1rem;
+    #devSettings {
+      border: 0;
+      padding: 0;
+      min-width: 0;
     }
 
-    .dev-controls label {
-      font-size: 0.85rem;
-      opacity: 0.8;
+    .dev-settings-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
     }
 
-    .dev-controls input {
-      font: inherit;
-      padding: 0.2rem 0.4rem;
-    }
-
-    #devFonts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      align-items: center;
-      margin: 0 1rem 0.5rem;
-    }
-
-    #devFonts span {
-      font-size: 0.85rem;
-      opacity: 0.8;
-    }
-
-    #devFonts button {
-      font: inherit;
-      font-size: 0.85rem;
-      padding: 0.2rem 0.6rem;
-      border: 1px solid var(--border-color);
-      border-radius: 999px;
-      background: var(--secondary-bg);
-      cursor: pointer;
-    }
-
-    #devFonts button:hover {
-      border-color: var(--highlight-color);
-      color: var(--highlight-color);
-    }
-
-    .dev-config {
-      display: block;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .dev-config p {
-      margin: 0 0 0.5rem;
-    }
-
-    .dev-config dl {
-      display: grid;
-      grid-template-columns: max-content 1fr;
-      gap: 0.25rem 0.75rem;
-      margin: 0;
-    }
-
-    .dev-config dt {
-      opacity: 0.8;
-    }
-
-    .dev-config dd {
-      margin: 0;
+    .dev-settings-table th,
+    .dev-settings-table td {
+      padding: 0.65rem;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+      vertical-align: top;
       overflow-wrap: anywhere;
+    }
+
+    .dev-settings-table th:first-child {
+      width: 35%;
+    }
+
+    .dev-settings-table tbody th {
+      font-weight: normal;
+    }
+
+    .dev-settings-table input,
+    .dev-settings-table select,
+    .dev-settings-table textarea {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 0;
+      padding: 0.35rem;
+      font: inherit;
+      color: var(--text-color);
+      background: var(--secondary-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+
+    .dev-settings-table textarea {
+      resize: vertical;
+    }
+
+    .dev-settings-table .dev-explicit {
+      font-weight: bold;
+    }
+
+    .dev-settings-table .dev-default {
+      color: color-mix(in srgb, var(--text-color) 60%, var(--secondary-bg));
+      font-weight: normal;
+    }
+
+    .dev-setting-source {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.8rem;
+      color: color-mix(in srgb, var(--text-color) 60%, var(--secondary-bg));
+    }
+
+    .dev-setting-error {
+      display: block;
+      color: var(--error-border);
+      font-size: 0.85rem;
     }
   </style>
 </head>
@@ -201,120 +193,72 @@
         <h3>Installs</h3>
       </div>
       <nav class="dev-menu" aria-label="TooToo install previews">
-        <button type="button" data-owner="heritage-happenings" data-repo="heritage-happenings.github.io" data-branch="master" aria-pressed="false">heritage-happenings.github.io</button>
-        <button type="button" data-owner="heritage-happenings" data-repo="documents" data-branch="main" aria-pressed="false">heritage-happenings-documents</button>
-        <button type="button" data-owner="pushme-pullyou" data-repo="assets" data-branch="main" aria-pressed="false">pushme-pullyou-assets</button>
-        <button type="button" data-owner="pushme-pullyou" data-repo="2019" data-branch="main" aria-pressed="false">pushme-pullyou-github</button>
-        <button type="button" data-owner="pushme-pullyou" data-repo="pushme-pullyou.github.io" data-branch="main" aria-pressed="false">pushme-pullyou-github-io</button>
-        <button type="button" data-owner="theo-armour" data-repo="2025" data-branch="main" aria-pressed="false">theo-armour-2025</button>
-        <button type="button" data-owner="theo-armour" data-repo="2026" data-branch="main" aria-pressed="false">theo-armour-2026</button>
-        <button type="button" data-owner="theo-armour" data-repo="aa" data-branch="main" aria-pressed="false">theo-armour-aa</button>
-        <button type="button" data-owner="theo-armour" data-repo="agenda" data-branch="main" aria-pressed="false">theo-armour-agenda</button>
-        <button type="button" data-owner="theo-armour" data-repo="collection" data-branch="main" aria-pressed="false">theo-armour-collection</button>
-        <button type="button" data-owner="theo-armour" data-repo="genealogy" data-branch="main" aria-pressed="false">theo-armour-genealogy</button>
-        <button type="button" data-owner="theo-armour" data-repo="pages" data-branch="main" aria-pressed="false">theo-armour-pages</button>
-        <button type="button" data-owner="theo-armour" data-repo="qdata" data-branch="main" aria-pressed="false">theo-armour-qdata</button>
-        <button type="button" data-owner="theo-armour" data-repo="sandbox" data-branch="main" aria-pressed="false">theo-armour-sandbox</button>
-        <button type="button" data-owner="theo-armour" data-repo="wikitheo" data-branch="main" aria-pressed="false">theo-armour-wikitheo</button>
-        <button type="button" data-owner="heritage-happenings" data-repo="tech" data-branch="main" aria-pressed="false">tech</button>
+        <p role="status">Loading INSTALL-LIST.md...</p>
       </nav>
     </aside>
 
     <section class="content-area dev-content" id="contentArea" aria-label="Header preview">
       <div class="panel-header file-header">
-        <h3>Header component preview</h3>
+        <h3>Install settings</h3>
       </div>
       <div id="contentBody">
-        <div class="dev-controls">
-          <h2>🎛️ Header preview settings</h2>
-          <label for="ctlOwner">owner</label>
-          <input id="ctlOwner" type="text" placeholder="e.g. pushme-pullyou">
-          <label for="ctlRepo">repo</label>
-          <input id="ctlRepo" type="text" placeholder="e.g. tootoo">
-          <label for="ctlBranch">branch</label>
-          <input id="ctlBranch" type="text" placeholder="e.g. main">
-          <label for="ctlSubtitle">subtitle</label>
-          <input id="ctlSubtitle" type="text" placeholder="(empty)">
-          <label for="ctlColor">themeColor</label>
-          <input id="ctlColor" type="color">
-          <label for="ctlAppName">appName</label>
-          <input id="ctlAppName" type="text" placeholder="shown when owner+repo empty">
-          <label for="ctlSource">sourceRepoUrl</label>
-          <input id="ctlSource" type="url" placeholder="https://github.com/…">
-          <label for="ctlFontUrl">headingFontUrl</label>
-          <input id="ctlFontUrl" type="url" placeholder="Google Fonts CSS or .woff2/.ttf URL">
-          <label for="ctlFont">headingFont</label>
-          <input id="ctlFont" type="text" placeholder='e.g. "Patua One", serif'>
-        </div>
-
-        <div class="dev-presets" id="devFonts">
-          <span>Heading font:</span>
-        </div>
-
-        <section class="dev-controls dev-config" id="devInstallConfig" aria-labelledby="devConfigHeading" hidden>
-          <h2 id="devConfigHeading">📄 Install tootoo.config.js</h2>
-          <p id="devConfigStatus" role="status"></p>
-          <dl id="devConfigOther"></dl>
-        </section>
+        <p class="dev-settings-note"><strong>Bold: install values or edits.</strong> Lighter: defaults.
+          Edits update the header preview. Download the config to save your changes.</p>
+        <p id="devConfigStatus" role="status">Showing defaults; the preview starts at pushme-pullyou/dolittle.</p>
+        <fieldset id="devSettings" aria-label="Configuration settings">
+          <button id="devDownloadConfig" type="button">Download tootoo.config.js</button>
+          <p id="devSaveStatus" role="status"></p>
+          <table class="dev-settings-table">
+            <thead><tr><th scope="col">Setting</th><th scope="col">Value</th></tr></thead>
+            <tbody id="devSettingsBody"></tbody>
+          </table>
+        </fieldset>
+        <details>
+          <summary>About this preview</summary>
+          <p>Owner, repo, and branch fall back to the selected install when empty.
+            Non-header settings are editable for inspection; <code>storagePrefix</code>
+            does not change this preview's token storage. Arrays and objects use JSON.
+            Downloads contain explicit settings and edits, not inherited defaults.
+            Place the downloaded file beside your install's index.html; this page does not
+            overwrite repository files or publish changes.</p>
+        </details>
       </div>
     </section>
   </main>
 
   <!-- Component dependencies. -->
   <script src="../../js/core.js"></script>
-  <!-- Built-in defaults, before the mock overwrites them: an install's config is
-       merged over these, exactly as main.js merges window.TOOTOO_CONFIG. -->
+  <!-- Install values are merged over these defaults, as in main.js. -->
   <script>const CONFIG_DEFAULTS = structuredClone( CONFIG );</script>
-  <script src="../../mock/mock-data.js"></script>
   <script src="header.js"></script>
 
   <!-- Dev harness: seed control values, then mutate CONFIG + re-render. -->
   <script>
     const byId = ( id ) => document.getElementById( id );
 
+    let previewInstall = { owner: 'pushme-pullyou', repo: 'dolittle', branch: 'main' };
+    let installValues = {};
+    let draftValues = {};
+    const configStatus = byId( 'devConfigStatus' );
+    const settings = byId( 'devSettings' );
+    const settingsBody = byId( 'devSettingsBody' );
+    const saveStatus = byId( 'devSaveStatus' );
+    Object.assign( state, previewInstall );
+    rememberPages( 'pushme-pullyou', 'pushme-pullyou.github.io', true );
+    rememberPages( 'pushme-pullyou', 'dolittle', true );
     initHeader();
     // Standalone page: the brand mark's static src="favicon.ico" resolves relative to
     // this file (src/components/header/), so point it at the dev folder's generated one.
     byId( 'headerBrand' ).src = '../../../favicon.ico';
-    byId( 'ctlOwner' ).value = state.owner || CONFIG.owner || '';
-    byId( 'ctlRepo' ).value = state.repo || CONFIG.repo || '';
-    byId( 'ctlBranch' ).value = state.branch || CONFIG.branch || '';
-    byId( 'ctlSubtitle' ).value = CONFIG.subtitle || '';
-    // Default to the live --highlight-color from styles.css (one source of truth)
-    // rather than a hard-coded hex; initAppearance has already applied it.
-    byId( 'ctlColor' ).value = CONFIG.themeColor ||
-      getComputedStyle( document.documentElement ).getPropertyValue( '--highlight-color' ).trim() || '#2563eb';
-    byId( 'ctlAppName' ).value = CONFIG.appName || '';
-    byId( 'ctlSource' ).value = CONFIG.sourceRepoUrl || '';
-    byId( 'ctlFontUrl' ).value = CONFIG.headingFontUrl || '';
-    byId( 'ctlFont' ).value = CONFIG.headingFont || '';
-
-    const reflectConfig = ( id, key ) => byId( id ).addEventListener( 'input', ( e ) => {
-      CONFIG[ key ] = e.target.value; updateHeaderFromConfig();
-    } );
-
-    // headingFont sets --heading-font (consumed by #headerTitle + h1–h6 CSS);
-    // empty clears it so the var falls back to the body font. A font-file URL is
-    // registered under this family, so re-register when the family changes.
-    const reflectHeadingFont = () => byId( 'ctlFont' ).addEventListener( 'input', ( e ) => {
-      const value = e.target.value;
-      CONFIG.headingFont = value;
-      const root = document.documentElement.style;
-      if ( value ) root.setProperty( '--heading-font', value );
-      else root.removeProperty( '--heading-font' );
-      if ( isFontFileUrl( CONFIG.headingFontUrl ) ) loadFontFile( CONFIG.headingFontUrl, firstFontFamily( value ) );
-    } );
-
-    // headingFontUrl loads a stylesheet or a font file (core.js loadFontFile). Reuse a
-    // single <link> (vs. core.js's applyHeadingFont, which appends a fresh one each
-    // call) so live edits don't pile up stale font links in the dev page's <head>.
-    const reflectFontUrl = () => byId( 'ctlFontUrl' ).addEventListener( 'input', ( e ) => {
-      const value = e.target.value.trim();
-      CONFIG.headingFontUrl = value;
+    const syncHeadingFont = () => {
+      const value = CONFIG.headingFontUrl;
+      const family = CONFIG.headingFont || ( isFontFileUrl( value ) ? '"TooToo Heading", serif' : '' );
+      if ( family ) document.documentElement.style.setProperty( '--heading-font', family );
+      else document.documentElement.style.removeProperty( '--heading-font' );
       let link = byId( 'devHeadingFontLink' );
       if ( !value || isFontFileUrl( value ) ) {
         link?.remove();
-        if ( value ) loadFontFile( value, firstFontFamily( CONFIG.headingFont ) );
+        if ( value ) loadFontFile( value, firstFontFamily( family ) );
         return;
       }
       if ( !link ) {
@@ -323,16 +267,8 @@
         link.rel = 'stylesheet';
         document.head.appendChild( link );
       }
-      link.href = value;
-    } );
-
-    const reflectState = ( id, key ) => byId( id ).addEventListener( 'input', ( e ) => {
-      const value = e.target.value.trim();
-      state[ key ] = value;
-      CONFIG[ key ] = value;
-      updateHeaderFromConfig();
-      syncBranchChip();
-    } );
+      if ( link.getAttribute( 'href' ) !== value ) link.href = value;
+    };
 
     const syncBranchChip = () => {
       const branch = state.branch || CONFIG.branch || '';
@@ -349,17 +285,6 @@
       btn.title = `Branch: ${ branch } — click to switch`;
       btn.setAttribute( 'aria-label', `Branch ${ branch } — click to switch` );
     };
-
-    reflectState( 'ctlOwner', 'owner' );
-    reflectState( 'ctlRepo', 'repo' );
-    reflectState( 'ctlBranch', 'branch' );
-    reflectConfig( 'ctlSubtitle', 'subtitle' );
-    reflectConfig( 'ctlColor', 'themeColor' );
-    reflectConfig( 'ctlAppName', 'appName' );
-    reflectConfig( 'ctlSource', 'sourceRepoUrl' );   // used by the About panel (?)
-    reflectHeadingFont();
-    reflectFontUrl();
-    syncBranchChip();
 
     // ── Install buttons load that repo's real tootoo.config.js and apply it the way
     // main.js does: built-in defaults, then the install's values on top. ──
@@ -468,10 +393,10 @@
       throw new Error( `GitHub API returned ${ api.status }` );
     };
 
-    const CONTROLLED_KEYS = [ 'owner', 'repo', 'branch', 'subtitle', 'themeColor', 'appName', 'sourceRepoUrl', 'headingFontUrl', 'headingFont' ];
     // core.js keys the token and preferences by storagePrefix, so the harness keeps
     // its own — adopting an install's prefix would hide the token set via ⚙️.
-    const PINNED_KEYS = [ 'storagePrefix' ];
+    const previewStoragePrefix = CONFIG.storagePrefix;
+    const owns = ( values, key ) => Object.prototype.hasOwnProperty.call( values, key );
 
     const syncHomeLink = () => {
       const home = byId( 'headerHome' );
@@ -480,44 +405,150 @@
       home.title = CONFIG.homeUrl ? `Home — ${ CONFIG.homeUrl }` : 'Home';
     };
 
-    const applyInstallConfig = ( button, values ) => {
-      const pinned = Object.fromEntries( PINNED_KEYS.map( ( key ) => [ key, CONFIG[ key ] ] ) );
+    const updatePreview = () => {
       for ( const key of Object.keys( CONFIG ) ) delete CONFIG[ key ];
-      Object.assign( CONFIG, structuredClone( CONFIG_DEFAULTS ), values, pinned );
-      state.owner = CONFIG.owner = CONFIG.owner || button.dataset.owner;
-      state.repo = CONFIG.repo = CONFIG.repo || button.dataset.repo;
-      state.branch = CONFIG.branch = CONFIG.branch || button.dataset.branch;   // '' = the repo's default branch
+      Object.assign( CONFIG, structuredClone( CONFIG_DEFAULTS ), draftValues, { storagePrefix: previewStoragePrefix } );
+      for ( const key of [ 'owner', 'repo', 'branch' ] ) state[ key ] = CONFIG[ key ] || previewInstall[ key ];
 
-      [ [ 'ctlOwner', 'owner' ], [ 'ctlRepo', 'repo' ], [ 'ctlBranch', 'branch' ], [ 'ctlSubtitle', 'subtitle' ],
-        [ 'ctlAppName', 'appName' ], [ 'ctlSource', 'sourceRepoUrl' ] ].forEach( ( [ id, key ] ) => { byId( id ).value = CONFIG[ key ] || ''; } );
-
-      // An empty themeColor means the CSS default, so drop the previous install's override.
       if ( !CONFIG.themeColor ) {
         document.documentElement.style.removeProperty( '--highlight-color' );
         document.body.style.removeProperty( '--highlight-color' );
       }
-      const shownColor = CONFIG.themeColor ||
-        getComputedStyle( document.documentElement ).getPropertyValue( '--highlight-color' ).trim();
-      if ( /^#[0-9a-f]{6}$/i.test( shownColor ) ) byId( 'ctlColor' ).value = shownColor;
-
       updateHeaderFromConfig();
       syncBranchChip();
       syncHomeLink();
-      applyFont( { headingFont: CONFIG.headingFont, headingFontUrl: CONFIG.headingFontUrl } );
+      syncHeadingFont();
     };
 
-    const showConfigReport = ( statusHtml, values = {} ) => {
-      byId( 'devInstallConfig' ).hidden = false;
-      byId( 'devConfigStatus' ).innerHTML = statusHtml;
-      byId( 'devConfigOther' ).innerHTML = Object.entries( values )
-        .filter( ( [ key ] ) => !CONTROLLED_KEYS.includes( key ) )
-        .map( ( [ key, v ] ) => `<dt>${ escapeHTML( key ) }</dt><dd><code>${ escapeHTML( JSON.stringify( v ) ) }</code></dd>` )
-        .join( '' );
+    const validateSetting = ( key, value ) => {
+      if ( !owns( CONFIG_DEFAULTS, key ) ) return;
+      const standard = CONFIG_DEFAULTS[ key ];
+      if ( Array.isArray( standard ) || key === 'rightsOwners' ) {
+        if ( key === 'rightsOwners' && value === null ) return;
+        if ( !Array.isArray( value ) || value.some( ( item ) => typeof item !== 'string' ) ) {
+          throw new Error( key === 'rightsOwners' ? 'Use null or a JSON array of strings.' : 'Use a JSON array of strings.' );
+        }
+      } else if ( typeof value !== typeof standard ) {
+        throw new Error( `Use a ${ typeof standard } value.` );
+      }
     };
+
+    const renderSettings = () => {
+      saveStatus.textContent = '';
+      settingsBody.replaceChildren();
+      const values = { ...CONFIG_DEFAULTS, ...draftValues };
+      for ( const [ index, [ key, value ] ] of Object.entries( values ).entries() ) {
+        const row = document.createElement( 'tr' );
+        row.dataset.key = key;
+        const heading = document.createElement( 'th' );
+        heading.scope = 'row';
+        const label = document.createElement( 'label' );
+        label.htmlFor = `setting-${ index }`;
+        label.textContent = key;
+        heading.appendChild( label );
+        if ( !owns( CONFIG_DEFAULTS, key ) ) {
+          const hint = document.createElement( 'small' );
+          hint.className = 'dev-setting-source';
+          hint.textContent = 'Unknown setting; no built-in preview behavior.';
+          heading.appendChild( hint );
+        }
+        const cell = document.createElement( 'td' );
+        const boolean = typeof CONFIG_DEFAULTS[ key ] === 'boolean' || typeof value === 'boolean';
+        const json = !boolean && typeof value !== 'string';
+        const control = document.createElement( boolean ? 'select' : json ? 'textarea' : 'input' );
+        control.id = label.htmlFor;
+        if ( boolean ) {
+          for ( const optionValue of [ 'true', 'false' ] ) {
+            const option = document.createElement( 'option' );
+            option.value = option.textContent = optionValue;
+            control.appendChild( option );
+          }
+        } else if ( json ) control.rows = 2;
+        else {
+          control.type = 'text';
+          control.placeholder = '(empty)';
+        }
+        control.value = typeof value === 'string' ? value : JSON.stringify( value );
+        const source = document.createElement( 'small' );
+        source.className = 'dev-setting-source';
+        source.id = `${ control.id }-source`;
+        const error = document.createElement( 'span' );
+        error.className = 'dev-setting-error';
+        error.id = `${ control.id }-error`;
+        error.setAttribute( 'role', 'alert' );
+        control.setAttribute( 'aria-describedby', `${ source.id } ${ error.id }` );
+        const reset = document.createElement( 'button' );
+        reset.type = 'button';
+        reset.textContent = owns( CONFIG_DEFAULTS, key ) ? 'Use default' : 'Remove setting';
+        reset.setAttribute( 'aria-label', `${ reset.textContent }: ${ key }` );
+        const reflectSource = () => {
+          const explicit = owns( draftValues, key );
+          control.className = explicit ? 'dev-explicit' : 'dev-default';
+          source.textContent = !explicit ? 'Default' :
+            owns( installValues, key ) && JSON.stringify( draftValues[ key ] ) === JSON.stringify( installValues[ key ] )
+              ? 'Install value' : 'Edited here (not saved)';
+          reset.hidden = !explicit;
+        };
+        control.addEventListener( 'input', () => {
+          saveStatus.textContent = '';
+          try {
+            const next = boolean || json ? JSON.parse( control.value ) : control.value;
+            validateSetting( key, next );
+            draftValues[ key ] = next;
+            error.textContent = '';
+            control.removeAttribute( 'aria-invalid' );
+            reflectSource();
+            updatePreview();
+          } catch ( err ) {
+            error.textContent = err.message;
+            control.setAttribute( 'aria-invalid', 'true' );
+          }
+        } );
+        reset.addEventListener( 'click', () => {
+          delete draftValues[ key ];
+          updatePreview();
+          renderSettings();
+        } );
+        reflectSource();
+        cell.append( control, source, error, reset );
+        row.append( heading, cell );
+        settingsBody.appendChild( row );
+      }
+    };
+
+    const applyInstallConfig = ( button, values ) => {
+      previewInstall = { ...button.dataset };
+      installValues = structuredClone( values );
+      draftValues = structuredClone( values );
+      updatePreview();
+      renderSettings();
+    };
+
+    const showConfigReport = ( statusHtml ) => { configStatus.innerHTML = statusHtml; };
+
+    byId( 'devDownloadConfig' ).addEventListener( 'click', () => {
+      const invalid = settingsBody.querySelector( '[aria-invalid="true"]' );
+      if ( invalid ) {
+        saveStatus.textContent = 'Fix the invalid setting before downloading.';
+        invalid.focus();
+        return;
+      }
+      const source = `window.TOOTOO_CONFIG = ${ JSON.stringify( draftValues, null, 2 ) };\n`;
+      const url = URL.createObjectURL( new Blob( [ source ], { type: 'text/javascript;charset=utf-8' } ) );
+      const link = document.createElement( 'a' );
+      link.href = url;
+      link.download = 'tootoo.config.js';
+      document.body.appendChild( link );
+      link.click();
+      link.remove();
+      setTimeout( () => URL.revokeObjectURL( url ), 1000 );
+      saveStatus.textContent = 'Download requested: tootoo.config.js. Place it beside your install\'s index.html.';
+    } );
 
     let installLoad = 0;   // newest click wins; a slower earlier fetch is dropped
-    document.querySelectorAll( '.dev-menu button' ).forEach( ( button ) => {
-      button.addEventListener( 'click', async () => {
+    document.querySelector( '.dev-menu' ).addEventListener( 'click', async ( event ) => {
+        const button = event.target.closest( 'button[data-owner][data-repo]' );
+        if ( !button ) return;
         if ( activePanel ) closeInfoPanel();   // the controls are detached while ?/⚙️ is open
         document.querySelectorAll( '.dev-menu button' ).forEach( ( item ) =>
           item.setAttribute( 'aria-pressed', String( item === button ) ) );
@@ -525,6 +556,8 @@
         const { owner, repo } = button.dataset;
         const name = escapeHTML( `${ owner }/${ repo }` );
         const fileUrl = `https://github.com/${ encodeURIComponent( owner ) }/${ encodeURIComponent( repo ) }/blob/HEAD/tootoo.config.js`;
+        settings.disabled = true;
+        saveStatus.textContent = '';
         showConfigReport( `Loading ${ name } tootoo.config.js…` );
         let values = {};
         let status;
@@ -537,9 +570,10 @@
               : `⚠️ Couldn't read ${ name } tootoo.config.js — the repo may be private. Set a token with ⚙️, then select it again. Showing TooToo defaults.`;
           } else {
             const parsed = parseConfigLiteral( res.text );
+            for ( const [ key, value ] of Object.entries( parsed.values ) ) validateSetting( key, value );
             values = parsed.values;
             const dupes = [ ...new Set( parsed.duplicates ) ];
-            status = `Loaded <a href="${ escapeHTML( fileUrl ) }" target="_blank" rel="noopener">${ name } tootoo.config.js</a>. Other settings (not editable here):` +
+            status = `Loaded <a href="${ escapeHTML( fileUrl ) }" target="_blank" rel="noopener">${ name } tootoo.config.js</a>.` +
               ( dupes.length ? `<br>⚠️ Set more than once (the last value wins): <code>${ escapeHTML( dupes.join( ', ' ) ) }</code>` : '' );
           }
         } catch ( err ) {
@@ -547,12 +581,12 @@
           status = `⚠️ Couldn't load ${ name } tootoo.config.js: ${ escapeHTML( err.message ) }. Showing TooToo defaults.`;
         }
         applyInstallConfig( button, values );
-        showConfigReport( status, values );
+        showConfigReport( status );
+        settings.disabled = false;
         // The app learns Pages status from the repo details it fetches anyway; the
         // preview has no such fetch, so look up anything not yet remembered — the repo
         // and the owner's <owner>.github.io site — then redraw the owner / repo links.
         if ( await learnPages( owner, repo, seq ) && seq === installLoad ) updateHeaderFromConfig();
-      } );
     } );
 
     const learnPages = async ( owner, repo, seq ) => {
@@ -572,7 +606,7 @@
       await Promise.all( lookups );
       if ( seq !== installLoad ) return false;
       const said = ( r ) => ( { true: '✓ published', false: '✗ none' } )[ pagesKnown( owner, r ) ] || '? unknown';
-      byId( 'devConfigStatus' ).insertAdjacentHTML( 'beforeend',
+      configStatus.insertAdjacentHTML( 'beforeend',
         `<br>github.io check — ${ escapeHTML( repo ) }: ${ said( repo ) } · ${ escapeHTML( owner.toLowerCase() ) }.github.io: ${ said( `${ owner.toLowerCase() }.github.io` ) }` +
         ( problems.length ? `<br>⚠️ Lookup failed (links stay on github.com): ${ escapeHTML( problems.join( '; ' ) ) }` : '' ) );
       return lookups.length > 0;
@@ -610,46 +644,43 @@
         '<p class="dev-note">Self-test needs the full app (content renderers + repo tree). Run it from <code>index.html</code>.</p>' );
     };
 
-    // The harness doesn't load main.js (so applyHeadingFont never runs), yet the
-    // controls are seeded from CONFIG.headingFont. Apply that seed through the managed
-    // -link path so the preview matches the panel — not a raw applyHeadingFont(), which
-    // would append an unmanaged <link> and reintroduce the stale-link pileup.
-    byId( 'ctlFontUrl' ).dispatchEvent( new Event( 'input' ) );
-    byId( 'ctlFont' ).dispatchEvent( new Event( 'input' ) );
+    updatePreview();
+    renderSettings();
 
-    // ── Quick heading-font swatches: each button just drives the headingFont +
-    // headingFontUrl controls (via their 'input' handlers). 'None' clears both to
-    // prove the system-font fallback. Buttons render in their own face once loaded. ──
-    const FONTS = [
-      { name: 'Fraunces', headingFont: '"Fraunces", serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&display=swap' },
-      { name: 'Space Grotesk', headingFont: '"Space Grotesk", sans-serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&display=swap' },
-      { name: 'Bitter', headingFont: '"Bitter", serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Bitter:wght@600&display=swap' },
-      { name: 'Sigmar', headingFont: '"Sigmar", sans-serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Sigmar&display=swap' },
-      { name: 'Rammetto One', headingFont: '"Rammetto One", sans-serif', headingFontUrl: 'https://fonts.googleapis.com/css2?family=Rammetto+One&display=swap' },
-      { name: 'Windsor', headingFont: '"Windsor", serif', headingFontUrl: 'https://pushme-pullyou.github.io/assets/fonts/Windsor%20Regular.ttf' },
-      { name: 'None', headingFont: '', headingFontUrl: '' },
-    ];
-    const applyFont = ( f ) => {
-      const fire = ( id, value ) => {
-        const el = byId( id );
-        el.value = value;
-        el.dispatchEvent( new Event( 'input', { bubbles: true } ) );
-      };
-      // Clear the URL, set the family, then the URL: a font file registers under the
-      // current family, so it must never pair with the previous swatch's name.
-      fire( 'ctlFontUrl', '' );
-      fire( 'ctlFont', f.headingFont );
-      fire( 'ctlFontUrl', f.headingFontUrl );
+    const loadInstallList = async () => {
+      const menu = document.querySelector( '.dev-menu' );
+      try {
+        const response = await fetch( '../../../INSTALL-LIST.md', { cache: 'no-store' } );
+        if ( !response.ok ) throw new Error( `HTTP ${ response.status }` );
+        const text = await response.text();
+        const targets = text.split( /^## /m ).find( ( section ) => /^Targets[ \t]*\r?\n/.test( section ) );
+        if ( !targets ) throw new Error( 'Targets section not found' );
+        const rows = targets.split( /\r?\n/ ).filter( ( line ) => /^\|\s*`/.test( line ) );
+        if ( !rows.length ) throw new Error( 'No install rows found' );
+        const buttons = rows.map( ( row ) => {
+          const cells = row.split( '|' ).slice( 1, -1 ).map( ( cell ) => cell.trim() );
+          const identity = /^([\w.-]+)\/([\w.-]+)$/.exec( cells[ 1 ] || '' );
+          if ( cells.length !== 3 || !/^`[^`]+[\\/]index\.html`$/i.test( cells[ 0 ] ) || !identity || !cells[ 2 ] ) {
+            throw new Error( `Invalid install row: ${ row }` );
+          }
+          const button = document.createElement( 'button' );
+          button.type = 'button';
+          button.dataset.owner = identity[ 1 ];
+          button.dataset.repo = identity[ 2 ];
+          button.dataset.branch = cells[ 2 ];
+          button.setAttribute( 'aria-pressed', 'false' );
+          button.textContent = cells[ 1 ];
+          return button;
+        } );
+        menu.replaceChildren( ...buttons );
+      } catch ( err ) {
+        const status = document.createElement( 'p' );
+        status.setAttribute( 'role', 'alert' );
+        status.textContent = `Couldn't load INSTALL-LIST.md: ${ err.message }. Check the file and local file access permissions.`;
+        menu.replaceChildren( status );
+      }
     };
-    const fontBar = byId( 'devFonts' );
-    FONTS.forEach( ( f ) => {
-      const btn = document.createElement( 'button' );
-      btn.type = 'button';
-      btn.textContent = f.name;
-      if ( f.headingFont ) btn.style.fontFamily = f.headingFont;   // preview the face on the button itself
-      btn.addEventListener( 'click', () => applyFont( f ) );
-      fontBar.appendChild( btn );
-    } );
+    loadInstallList();
   </script>
 
 </body>

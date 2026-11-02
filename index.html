@@ -1252,7 +1252,7 @@ const CONFIG = {
   homeUrl: '',               // when set, the header shows a ⌂ link to this hub page
   storagePrefix: 'tootoo',
   hiddenFolders: [], hiddenFiles: [ 'tootoo.config.js' ],
-  hideDatedBackups: false,     // hide "name-2026-10-24…" backup snapshots from the tree (date-FIRST names stay)
+  hideDatedBackups: true,      // hide "name-2026-10-24…" backup snapshots from the tree (date-FIRST names stay)
   preferPagesUrls: false,      // this install's owner serves every repo on GitHub Pages → New Tab / header links use the live sites
   autoOpenFolderReadme: true,  // expanding a folder opens its own README the first time (set false to disable)
   // Footer rights line appended after "© <year> <owner>". rightsOwners scopes WHICH
@@ -3206,9 +3206,8 @@ const renderCode = ( text, ext ) => {
 
 const renderHtml = ( text, ext ) => {
   const url = createBlobUrl( new Blob( [ text ], { type: 'text/html' } ) );
-  const note = `<div class="md-error">ℹ️ Preview is sandboxed: scripts and relative assets are disabled.<br>Click <strong>&lt;/&gt;</strong> to show the raw source, or <strong>↗ New Tab</strong> to open the file directly (renders from a local copy; GitHub's raw host shows source).</div>`;
   document.getElementById( 'contentBody' ).innerHTML =
-    buildToggleHtml( ext, `${ note }<iframe class="iframe-content" sandbox src="${ escapeHTML( url ) }"></iframe>`, text );
+    buildToggleHtml( ext, `<iframe class="iframe-content" src="${ escapeHTML( url ) }"></iframe>`, text );
 };
 
 const renderSvg = ( text, fileName = 'SVG image' ) => {

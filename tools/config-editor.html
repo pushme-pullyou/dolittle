@@ -551,7 +551,7 @@
             <p class="hint">This list replaces the built-in list. The default keeps this config file hidden; remove it if you want to show the file in the tree.</p>
           </div>
           <label class="check">
-            <input id="hideDatedBackups" name="hideDatedBackups" type="checkbox">
+            <input id="hideDatedBackups" name="hideDatedBackups" type="checkbox" checked>
             <span>Hide files recognized as dated backups from the tree</span>
           </label>
           <label class="check">
@@ -742,9 +742,8 @@
         rightsScope.value = values.rightsOwners.length ? 'listed' : 'none';
         form.elements.rightsOwners.value = values.rightsOwners.join( '\n' );
       }
-      for ( const key of [ 'hideDatedBackups', 'preferPagesUrls' ] ) {
-        form.elements[ key ].checked = values[ key ] === true;
-      }
+      form.elements.hideDatedBackups.checked = values.hideDatedBackups !== false;
+      form.elements.preferPagesUrls.checked = values.preferPagesUrls === true;
       form.elements.autoOpenFolderReadme.checked = values.autoOpenFolderReadme !== false;
       if ( !values.owner ) form.elements.owner.value = install.owner;
       if ( !values.repo ) form.elements.repo.value = install.repo;
@@ -855,9 +854,8 @@
         entries.push( '  rightsOwners: []' );
       }
 
-      for ( const key of [ 'hideDatedBackups', 'preferPagesUrls' ] ) {
-        if ( form.elements[ key ].checked ) entries.push( `  ${ key }: true` );
-      }
+      if ( !form.elements.hideDatedBackups.checked ) entries.push( '  hideDatedBackups: false' );
+      if ( form.elements.preferPagesUrls.checked ) entries.push( '  preferPagesUrls: true' );
       if ( !form.elements.autoOpenFolderReadme.checked ) entries.push( '  autoOpenFolderReadme: false' );
 
       return `window.TOOTOO_CONFIG = {\n${ entries.join( ',\n' ) }\n};\n`;

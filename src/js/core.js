@@ -16,7 +16,7 @@ const CONFIG = {
   homeUrl: '',               // when set, the header shows a ⌂ link to this hub page
   storagePrefix: 'tootoo',
   hiddenFolders: [], hiddenFiles: [ 'tootoo.config.js' ],
-  hideDatedBackups: false,     // hide "name-2026-10-24…" backup snapshots from the tree (date-FIRST names stay)
+  hideDatedBackups: true,      // hide "name-2026-10-24…" backup snapshots from the tree (date-FIRST names stay)
   preferPagesUrls: false,      // this install's owner serves every repo on GitHub Pages → New Tab / header links use the live sites
   autoOpenFolderReadme: true,  // expanding a folder opens its own README the first time (set false to disable)
   // Footer rights line appended after "© <year> <owner>". rightsOwners scopes WHICH

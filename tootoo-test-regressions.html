@@ -147,11 +147,42 @@
         }
         check( 'HTML aliases still share their preference', viewPrefKey( 'htm' ) === viewPrefKey( 'html' ) );
 
+        for ( const ext of [ 'html', 'htm' ] ) {
+          setPreferredView( ext, 'rendered' );
+          let reply;
+          const receive = ( event ) => {
+            const frame = document.querySelector( '#viewRendered iframe' );
+            if ( event.source === frame?.contentWindow && event.data?.test === testPrefix ) reply = event;
+          };
+          window.addEventListener( 'message', receive );
+          const html = `<script>
+            let parentBlocked = false;
+            try { parent.document.title; } catch (_) { parentBlocked = true; }
+            parent.postMessage({ test: ${ JSON.stringify( testPrefix ) }, parentBlocked }, '*');
+          <\/script>`;
+          try {
+            renderHtml( html, ext );
+            await until( () => !!reply );
+            check( ext + ' runs scripts in its iframe', !!reply );
+            check( ext + ' runs without sandbox restrictions',
+              !document.querySelector( '#viewRendered iframe' ).hasAttribute( 'sandbox' ) && !reply.data.parentBlocked );
+            check( ext + ' has no sandbox notice and retains raw source',
+              !document.querySelector( '#viewRendered .md-error' ) && document.getElementById( 'viewRaw' ).textContent === html );
+          } finally {
+            window.removeEventListener( 'message', receive );
+          }
+        }
+
         const unusual = [ 'constructor', '__proto__', 'toString' ].flatMap( ( name ) => [
           { path: name, type: 'tree' }, { path: name + '/README.md', type: 'blob', size: 1 }
         ] );
         renderTree( unusual );
         check( 'Prototype-like folder names render normally', document.querySelectorAll( '#treeList .tree-item' ).length === 3 );
+        check( 'Dated backups are hidden by default', CONFIG.hideDatedBackups === true
+          && !isVisibleTreeItem( { path: 'index-2026-11-02.html', type: 'blob' }, new Set(), new Set() ) );
+        check( 'Date-first content stays visible', isVisibleTreeItem( { path: '2026-11-02-post.md', type: 'blob' }, new Set(), new Set() ) );
+        CONFIG.hideDatedBackups = false;
+        check( 'Explicit false shows dated backups', isVisibleTreeItem( { path: 'index-2026-11-02.html', type: 'blob' }, new Set(), new Set() ) );
         renderTree( [
           { path: 'z-last.txt', type: 'blob', size: 1 },
           { path: 'README RFP.md', type: 'blob', size: 1 },
@@ -174,6 +205,7 @@
           rootEntries.join( ',' ) === 'docs,README RFP.md,README.md-2026-11-01,z-last.txt' );
         check( 'README-prefixed files sort first among nested files after folders',
           docsEntries.join( ',' ) === 'docs/sub,docs/README RFP.md,docs/README.md-2026-11-01,docs/a-first.txt,docs/b-last.txt' );
+        CONFIG.hideDatedBackups = true;
         for ( const hasSubfolder of [ false, true ] ) {
           renderTree( [ { path: 'docs', type: 'tree' }, ...( hasSubfolder ? [ { path: 'docs/sub', type: 'tree' } ] : [] ), { path: hasSubfolder ? 'docs/sub/next.txt' : 'docs/next.txt', type: 'blob', size: 1 } ] );
           const folder = document.querySelector( 'details[data-folder-path="docs"]' ); folder.open = true;

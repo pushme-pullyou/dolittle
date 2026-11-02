@@ -1,5 +1,38 @@
 # TooToo — Development Journal
 
+## 2026-11-02
+
+* **Hide dated backups by default** — `hideDatedBackups` now defaults to `true`.
+  Set it to `false` to show backup snapshots. Date-first content stays visible.
+  The header settings and standalone config editor reflect the new default.
+
+* **Download header config** — added a `tootoo.config.js` download from the
+  unified settings table. Exports explicit install values and preview edits,
+  including unknown keys; inherited defaults are omitted. Invalid edits block
+  downloading. The browser saves a new file without changing or publishing repos.
+
+* **Unified header settings** — replaced separate preview controls and config
+  report with one editable setting/value table. Explicit install values and
+  preview edits are bold; inherited defaults are muted. All built-in settings
+  and unknown file keys are shown, with JSON validation for structured values
+  and a way to restore defaults. Edits are preview-only, not file writes.
+
+* **Live header install list** — the standalone header preview reads its menu
+  from INSTALL-LIST.md at startup, using the target table's owner/repo and branch.
+  Additions and removals no longer need matching hard-coded header buttons.
+  Load and format errors appear in the sidebar.
+
+* **Executable HTML previews** — HTML/HTM iframe previews now run without a
+  sandbox or the old sandbox notice. Open only trusted HTML: its scripts can
+  access TooToo's parent document and, on hosted origins, its stored GitHub token.
+  Raw-source viewing and Markdown iframe restrictions are unchanged.
+
+* **Header preview default** — the standalone header page now opens at
+  `pushme-pullyou / dolittle`, with the owner linked to
+  `https://pushme-pullyou.github.io/` and the repo linked to
+  `https://pushme-pullyou.github.io/dolittle`. Other component mocks and install
+  previews are unchanged.
+
 ## 2026-11-01
 
 * **Config editor** — added a standalone workshop tool at `tools/config-editor.html`

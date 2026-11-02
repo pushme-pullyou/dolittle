@@ -495,13 +495,43 @@ const pagesBase = () => state.repo.toLowerCase() === `${ state.owner.toLowerCase
   : `${ ownerSiteUrl() }/${ encodeURIComponent( state.repo ) }`;
 const pagesUrl = ( path ) => `${ pagesBase() }/${ encodePath( path ) }`;
 
-/* Positive evidence the browsed repo is published on Pages: it's an <owner>.github.io
-   site repo, it's the repo this app is itself served from on github.io, or the install
-   asserts it for every repo it browses (CONFIG.preferPagesUrls — single-owner hubs). */
-const repoHasPages = () => !!state.owner && !!state.repo && (
-  CONFIG.preferPagesUrls
-  || state.repo.toLowerCase() === `${ state.owner.toLowerCase() }.github.io`
-  || ( location.origin + location.pathname ).toLowerCase().startsWith( pagesBase().toLowerCase() + '/' ) );
+/* What GitHub's repo details said about Pages (has_pages), remembered per repo across
+   visits and pages of this install: true / false, or undefined when not yet seen. */
+const pagesStoreKey = () => `${ CONFIG.storagePrefix }:pages`;
+let pagesSeen = null;
+const readPagesSeen = () => {
+  if ( !pagesSeen ) {
+    try { pagesSeen = JSON.parse( localStorage.getItem( pagesStoreKey() ) || '{}' ) || {}; }
+    catch ( _ ) { pagesSeen = {}; }
+  }
+  return pagesSeen;
+};
+const pagesKnown = ( owner, repo ) => readPagesSeen()[ `${ owner }/${ repo }`.toLowerCase() ];
+const rememberPages = ( owner, repo, has ) => {
+  readPagesSeen()[ `${ owner }/${ repo }`.toLowerCase() ] = has;
+  try { localStorage.setItem( pagesStoreKey(), JSON.stringify( pagesSeen ) ); } catch ( _ ) { /* storage off */ }
+};
+
+/* Is the browsed repo published on Pages? Certain when the install asserts it for every
+   repo (CONFIG.preferPagesUrls — single-owner hubs) or this app is served from that
+   site; otherwise GitHub's remembered answer; failing that, assume only an
+   <owner>.github.io site repo is published. Unknown → raw, which always exists. */
+const repoHasPages = () => {
+  if ( !state.owner || !state.repo ) return false;
+  if ( CONFIG.preferPagesUrls
+    || ( location.origin + location.pathname ).toLowerCase().startsWith( pagesBase().toLowerCase() + '/' ) ) return true;
+  const known = pagesKnown( state.owner, state.repo );
+  if ( known !== undefined ) return known;
+  return state.repo.toLowerCase() === `${ state.owner.toLowerCase() }.github.io`;
+};
+
+/* Does the owner have a <owner>.github.io site? Same evidence, for the site repo. */
+const ownerHasSite = () => {
+  if ( !state.owner ) return false;
+  const site = `${ state.owner.toLowerCase() }.github.io`;
+  return !!CONFIG.preferPagesUrls || location.hostname.toLowerCase() === site
+    || pagesKnown( state.owner, site ) === true;
+};
 
 /* ── URL to open in a new tab / download: the local file in drop-in mode; downloads
    keep the raw URL (direct save); viewable files open the live GitHub Pages copy
@@ -519,6 +549,7 @@ const getDefaultBranch = async ( signal ) => {
   // Capture the repo's real last-push date so the header tooltip reflects the
   // repo being viewed (incl. drop-in mode), not this file's static build date.
   state.repoUpdated = data.pushed_at || '';
+  if ( typeof data.has_pages === 'boolean' ) rememberPages( state.owner, state.repo, data.has_pages );
   if ( isHomeRepo() ) homeRepo.defaultBranch = data.default_branch;
   return data.default_branch;
 };

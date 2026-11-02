@@ -16,9 +16,13 @@ navigation, About, and GitHub token controls.
   with no `?owner=…`, `#file`, cached repo, or last file. Its tooltip names the
   repo hosting the page (`<owner>.github.io/<repo>/` from the address, else the
   install's config). Clicking the title's background (e.g. the `/`) does the same.
-- **Owner** — the owner's `github.io` site when `preferPagesUrls` is set, else
-  their GitHub profile.
+- **Owner** — the owner's `github.io` site when it's known to exist, else their
+  GitHub profile.
 - **Repo** — its Pages site when known to be published, else the GitHub repo.
+  "Known" comes from the `has_pages` flag in the repo details the app already
+  fetches (remembered per repo, so later visits know straight away), from running
+  on that site, or from `preferPagesUrls: true`, which asserts it for every repo.
+  The same answer picks Pages or raw for the content panel and New Tab.
 - **⌂** — the hub page in `homeUrl`, when set.
 
 ## Layout
@@ -35,7 +39,9 @@ the way the app does: built-in defaults first, then the install's values. The
 header and the preview settings update to match. Settings the controls don't
 cover (favicon, hidden files and folders, `homeUrl`, …) are listed read-only
 below them, and keys set more than once are flagged. The file is read as data,
-never executed. Private repositories need a token, set with **⚙️**. The preview
+never executed. The preview also looks up whether the repo and the owner's
+`github.io` site are published (what the app learns from repo details it
+fetches anyway), so the owner / repo links match the app. Private repositories need a token, set with **⚙️**. The preview
 keeps its own `storagePrefix`, so the token stays visible. **?** and **⚙️** open
 the real About and Token panels in the content area; clicking the same button
 again restores the preview. The page stubs the few content/sidebar helpers those

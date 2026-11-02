@@ -548,8 +548,35 @@
         }
         applyInstallConfig( button, values );
         showConfigReport( status, values );
+        // The app learns Pages status from the repo details it fetches anyway; the
+        // preview has no such fetch, so look up anything not yet remembered — the repo
+        // and the owner's <owner>.github.io site — then redraw the owner / repo links.
+        if ( await learnPages( owner, repo, seq ) && seq === installLoad ) updateHeaderFromConfig();
       } );
     } );
+
+    const learnPages = async ( owner, repo, seq ) => {
+      const problems = [];
+      const lookups = [ repo, `${ owner.toLowerCase() }.github.io` ]
+        .filter( ( r, i, all ) => all.indexOf( r ) === i && pagesKnown( owner, r ) === undefined )
+        .map( async ( r ) => {
+          try {
+            const data = await ghApi( `https://api.github.com/repos/${ encodeURIComponent( owner ) }/${ encodeURIComponent( r ) }` );
+            if ( typeof data.has_pages === 'boolean' ) rememberPages( owner, r, data.has_pages );
+          } catch ( err ) {
+            // A missing site repo means no owner site; a missing repo may just be private.
+            if ( err.status === 404 ) { if ( r !== repo ) rememberPages( owner, r, false ); }
+            else problems.push( `${ r }: ${ err.message }` );
+          }
+        } );
+      await Promise.all( lookups );
+      if ( seq !== installLoad ) return false;
+      const said = ( r ) => ( { true: '✓ published', false: '✗ none' } )[ pagesKnown( owner, r ) ] || '? unknown';
+      byId( 'devConfigStatus' ).insertAdjacentHTML( 'beforeend',
+        `<br>github.io check — ${ escapeHTML( repo ) }: ${ said( repo ) } · ${ escapeHTML( owner.toLowerCase() ) }.github.io: ${ said( `${ owner.toLowerCase() }.github.io` ) }` +
+        ( problems.length ? `<br>⚠️ Lookup failed (links stay on github.com): ${ escapeHTML( problems.join( '; ' ) ) }` : '' ) );
+      return lookups.length > 0;
+    };
 
     // ── ? / ⚙️ panels: header.js renders them via content.js/sidebar.js helpers this
     // page doesn't load. Minimal stand-ins below; the preview header + controls are

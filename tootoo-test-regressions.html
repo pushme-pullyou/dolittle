@@ -35,7 +35,7 @@
         if ( value === '.git/HEAD' ) return new Response( head );
         if ( value.includes( '/git/trees/' ) ) return new Response( JSON.stringify( { tree } ) );
         if ( value.includes( '/rate_limit' ) ) return new Response( JSON.stringify( { resources: { core: { remaining: 60, limit: 60, reset: 0 } } } ) );
-        if ( /^https:\/\/api\.github\.com\/repos\/[^/]+\/[^/?]+$/.test( value ) ) return new Response( JSON.stringify( { default_branch: 'main' } ) );
+        if ( /^https:\/\/api\.github\.com\/repos\/[^/]+\/[^/?]+$/.test( value ) ) return new Response( JSON.stringify( { default_branch: 'main', has_pages: value.endsWith( '/pages-repo' ) } ) );
         return new Response( '# Heading\n\n' + ( value.startsWith( './' ) ? 'LOCAL CONTENT' : 'REMOTE CONTENT' ) );
       };
       window.fetch = fixtureFetch;
@@ -52,6 +52,21 @@
         state.branch = await getDefaultBranch();
         check( 'Another repository reads remote content', ( await fetchFileText( 'remote-check.md' ) ).includes( 'REMOTE CONTENT' ) );
         check( 'Another repository uses remote media and New Tab URLs', !localUrlFor( 'image.png' ) && getNewTabUrl( 'image.png' ).startsWith( 'https:' ) );
+        check( 'A repository reported without Pages opens raw', getNewTabUrl( 'page.html' ).startsWith( 'https://raw.githubusercontent.com/' ) );
+
+        setUrl( 'owner=remote-owner&repo=pages-repo' );
+        await detectLocalMode(); await detectRepo();
+        check( 'Unknown Pages status opens raw', getNewTabUrl( 'page.html' ).startsWith( 'https://raw.githubusercontent.com/' ) );
+        state.branch = await getDefaultBranch();
+        updateHeaderFromConfig();
+        const titleLinks = document.querySelectorAll( '#headerTitle a' );
+        check( 'A repository reported with Pages opens github.io and links there', getNewTabUrl( 'page.html' ) === 'https://remote-owner.github.io/pages-repo/page.html'
+          && titleLinks[ 1 ]?.getAttribute( 'href' ) === 'https://remote-owner.github.io/pages-repo'
+          && titleLinks[ 0 ]?.getAttribute( 'href' ) === 'https://github.com/remote-owner' );
+        pagesSeen = null;
+        check( 'Pages status is remembered across visits', repoHasPages() && pagesKnown( 'remote-owner', 'remote-repo' ) === false );
+        rememberPages( 'remote-owner', 'remote-owner.github.io', true ); updateHeaderFromConfig();
+        check( 'Owner links to github.io once its site is known', document.querySelector( '#headerTitle a' )?.getAttribute( 'href' ) === 'https://remote-owner.github.io' );
 
         head = 'ref: refs/heads/work/topic';
         setUrl( 'owner=local-owner&repo=local-repo' );

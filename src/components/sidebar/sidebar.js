@@ -361,7 +361,7 @@ const fetchTree = async () => {
     pin( 'branch', state.branch, !home || state.branch !== homeBranch() );
     history.replaceState( null, '', url );
     cacheRepo();   // persist owner/repo/branch now that the branch is resolved
-    setHeaderTimestamp();   // refresh the title tooltip with this repo's last-push date
+    updateHeaderFromConfig();   // owner / repo links (Pages now known) + last-push tooltip
     updateBranchControl();   // show the branch chip in the sidebar header
     const data = await ghApi( `https://api.github.com/repos/${ encodeURIComponent( state.owner ) }/${ encodeURIComponent( state.repo ) }/git/trees/${ encodeURIComponent( state.branch ) }?recursive=1`, signal );
     if ( data.truncated ) {

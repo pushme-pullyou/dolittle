@@ -62,11 +62,12 @@ const updateHeaderFromConfig = () => {
   // Render owner / repo as two nowrap segments so a narrow header can wrap at the
   // slash (either side) instead of forcing one long unbreakable line. Each segment is
   // a live link — owner/repo can arrive from the URL (?owner=…) so they are untrusted:
-  // the URL helpers percent-encode them and every attribute is HTML-escaped. The repo
-  // links to its Pages site only on positive evidence (repoHasPages), else github.com;
-  // clicking the slash or the gaps still resets to home (see initHeaderControls).
+  // the URL helpers percent-encode them and every attribute is HTML-escaped. Owner and
+  // repo each link to their github.io site when it's known to exist (ownerHasSite /
+  // repoHasPages), else github.com; clicking the slash or the gaps still resets to
+  // home (see initHeaderControls).
   if ( state.owner && state.repo ) {
-    const ownerSite = CONFIG.preferPagesUrls ? ownerSiteUrl() : `https://github.com/${ encodeURIComponent( state.owner ) }`;
+    const ownerSite = ownerHasSite() ? ownerSiteUrl() : `https://github.com/${ encodeURIComponent( state.owner ) }`;
     const repoSite = repoHasPages() ? pagesBase()
       : `https://github.com/${ encodeURIComponent( state.owner ) }/${ encodeURIComponent( state.repo ) }`;
     titleEl.innerHTML =

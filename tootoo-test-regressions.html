@@ -184,6 +184,30 @@
           }
         }
 
+        const htmlRepo = { owner: state.owner, repo: state.repo, branch: state.branch, localMode };
+        try {
+          localMode = true;
+          Object.assign( state, localRepo );
+          await selectFile( 'index.html' );
+          check( 'HTML selection uses the real local file URL',
+            document.querySelector( '#viewRendered iframe' )?.getAttribute( 'src' ) === './index.html' );
+          document.getElementById( 'contentBody' ).replaceChildren();
+          localMode = false;
+          Object.assign( state, { owner: 'remote-owner', repo: 'pages-repo', branch: 'main' } );
+          renderHtml( '<p>Published</p>', 'htm', 'docs/page.htm' );
+          check( 'Published HTML uses its Pages URL',
+            document.querySelector( '#viewRendered iframe' )?.getAttribute( 'src' ) === 'https://remote-owner.github.io/pages-repo/docs/page.htm' );
+          document.getElementById( 'contentBody' ).replaceChildren();
+          state.repo = 'remote-repo';
+          renderHtml( '<p>Unpublished</p>', 'html', 'index.html' );
+          check( 'Unpublished remote HTML retains its blob fallback',
+            document.querySelector( '#viewRendered iframe' )?.getAttribute( 'src' ).startsWith( 'blob:' ) );
+          document.getElementById( 'contentBody' ).replaceChildren();
+        } finally {
+          localMode = htmlRepo.localMode;
+          Object.assign( state, { owner: htmlRepo.owner, repo: htmlRepo.repo, branch: htmlRepo.branch } );
+        }
+
         const unusual = [ 'constructor', '__proto__', 'toString' ].flatMap( ( name ) => [
           { path: name, type: 'tree' }, { path: name + '/README.md', type: 'blob', size: 1 }
         ] );

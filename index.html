@@ -1677,7 +1677,7 @@ const detectRepo = async () => {
     const owner = location.hostname.split( '.' )[ 0 ];
     const segs = location.pathname.split( '/' ).filter( Boolean );
     CONFIG.owner = owner;
-    CONFIG.repo = segs[ 0 ] || `${ owner }.github.io`;
+    CONFIG.repo = segs[ 0 ] && !/\.html?$/i.test( segs[ 0 ] ) ? segs[ 0 ] : `${ owner }.github.io`;
     applyRepo(); cacheRepo(); return;
   }
 
@@ -3214,8 +3214,9 @@ const renderCode = ( text, ext ) => {
   body.appendChild( pre );
 };
 
-const renderHtml = ( text, ext ) => {
-  const url = createBlobUrl( new Blob( [ text ], { type: 'text/html' } ) );
+const renderHtml = ( text, ext, path = '' ) => {
+  const direct = path && ( localUrlFor( path ) || ( repoHasPages() ? pagesUrl( path ) : '' ) );
+  const url = direct || createBlobUrl( new Blob( [ text ], { type: 'text/html' } ) );
   document.getElementById( 'contentBody' ).innerHTML =
     buildToggleHtml( ext, `<iframe class="iframe-content" src="${ escapeHTML( url ) }"></iframe>`, text );
 };
@@ -3375,7 +3376,7 @@ const selectFile = async ( path, anchor = '' ) => {
       lastRawText = text;
       if ( MARKDOWN_EXTS.includes( ext ) ) renderMarkdown( text, path, signal, anchor );
       else if ( ext === 'svg' ) renderSvg( text, path.split( '/' ).pop() );
-      else if ( ext === 'html' || ext === 'htm' ) renderHtml( text, ext );
+      else if ( ext === 'html' || ext === 'htm' ) renderHtml( text, ext, path );
       else renderCode( text, ext );
     }
     if ( signal.aborted ) return;
@@ -3680,7 +3681,8 @@ const initApp = async () => {
       selectFile( hashPath, hashAnchor );
     } else {
       let last = null;
-      try { last = sessionStorage.getItem( getCurrentFileKey() ); } catch ( _ ) { /* storage off */ }
+      // An embedded copy must not resume its parent's index.html selection recursively.
+      try { if ( window.self === window.top ) last = sessionStorage.getItem( getCurrentFileKey() ); } catch ( _ ) { /* storage off */ }
       if ( last && state.tree?.some( ( i ) => i.path === last && i.type === 'blob' ) ) selectFile( last );
       else autoSelectReadme();
     }

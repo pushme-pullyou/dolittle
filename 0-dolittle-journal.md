@@ -2,6 +2,13 @@
 
 ## 2026-11-02
 
+* **HTML iframe location** — HTML/HTM previews now load their real local file or
+  published Pages URL when available, preserving relative config/assets and
+  repository detection. Unpublished remote files retain the blob fallback.
+  Root-site `/index.html` URLs now detect the owner's site repo correctly.
+  Embedded app copies do not resume the parent's saved file selection, avoiding
+  recursive `index.html` previews.
+
 * **Editor cleanup** — both standalone editors now share the INSTALL-LIST.md
   loader; removed the config editor's stale hard-coded install list. Updated
   header documentation for the unified table, font presets, favicon files,

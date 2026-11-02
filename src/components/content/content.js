@@ -222,8 +222,9 @@ const renderCode = ( text, ext ) => {
   body.appendChild( pre );
 };
 
-const renderHtml = ( text, ext ) => {
-  const url = createBlobUrl( new Blob( [ text ], { type: 'text/html' } ) );
+const renderHtml = ( text, ext, path = '' ) => {
+  const direct = path && ( localUrlFor( path ) || ( repoHasPages() ? pagesUrl( path ) : '' ) );
+  const url = direct || createBlobUrl( new Blob( [ text ], { type: 'text/html' } ) );
   document.getElementById( 'contentBody' ).innerHTML =
     buildToggleHtml( ext, `<iframe class="iframe-content" src="${ escapeHTML( url ) }"></iframe>`, text );
 };
@@ -383,7 +384,7 @@ const selectFile = async ( path, anchor = '' ) => {
       lastRawText = text;
       if ( MARKDOWN_EXTS.includes( ext ) ) renderMarkdown( text, path, signal, anchor );
       else if ( ext === 'svg' ) renderSvg( text, path.split( '/' ).pop() );
-      else if ( ext === 'html' || ext === 'htm' ) renderHtml( text, ext );
+      else if ( ext === 'html' || ext === 'htm' ) renderHtml( text, ext, path );
       else renderCode( text, ext );
     }
     if ( signal.aborted ) return;

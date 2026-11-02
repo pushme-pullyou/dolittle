@@ -445,7 +445,7 @@ const detectRepo = async () => {
     const owner = location.hostname.split( '.' )[ 0 ];
     const segs = location.pathname.split( '/' ).filter( Boolean );
     CONFIG.owner = owner;
-    CONFIG.repo = segs[ 0 ] || `${ owner }.github.io`;
+    CONFIG.repo = segs[ 0 ] && !/\.html?$/i.test( segs[ 0 ] ) ? segs[ 0 ] : `${ owner }.github.io`;
     applyRepo(); cacheRepo(); return;
   }
 

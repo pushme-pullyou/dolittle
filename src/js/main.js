@@ -96,7 +96,8 @@ const initApp = async () => {
       selectFile( hashPath, hashAnchor );
     } else {
       let last = null;
-      try { last = sessionStorage.getItem( getCurrentFileKey() ); } catch ( _ ) { /* storage off */ }
+      // An embedded copy must not resume its parent's index.html selection recursively.
+      try { if ( window.self === window.top ) last = sessionStorage.getItem( getCurrentFileKey() ); } catch ( _ ) { /* storage off */ }
       if ( last && state.tree?.some( ( i ) => i.path === last && i.type === 'blob' ) ) selectFile( last );
       else autoSelectReadme();
     }

@@ -8,7 +8,7 @@ An **install** is a repo that carries an unmodified copy of the canonical `index
 
 All 16 are git repos, so every one is both a `sync` and a `publish` target.
 
-The standalone header preview loads this table on startup. Keep the GitHub identity
+The standalone header preview and config editor load this table on startup. Keep the GitHub identity
 and default preview branch with each path; folder names need not match repo names.
 
 | Local index.html path | Owner/repo | Branch |

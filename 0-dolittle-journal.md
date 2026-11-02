@@ -2,6 +2,11 @@
 
 ## 2026-11-02
 
+* **Editor cleanup** — both standalone editors now share the INSTALL-LIST.md
+  loader; removed the config editor's stale hard-coded install list. Updated
+  header documentation for the unified table, font presets, favicon files,
+  validation, and config downloads. The generated app has no new dependency.
+
 * **Heading font presets restored** — font buttons in the header settings update
   both font fields and the live preview, with the selected preset indicated.
   Choices are included in config downloads; None clears both fields.

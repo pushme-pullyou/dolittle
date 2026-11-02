@@ -7,8 +7,8 @@ navigation, About, and GitHub token controls.
   preview page.
 - [`header.js`](header.js) renders the header, restores preferences, and handles
   header controls and the About/Token panels.
-- It uses shared helpers from [`core.js`](../../js/core.js) and sample state from
-  [`mock-data.js`](../../mock/mock-data.js).
+- It uses shared helpers from [`core.js`](../../js/core.js). The standalone page
+  starts at `pushme-pullyou/dolittle`, without loading shared mock data.
 
 ## Links
 
@@ -33,12 +33,19 @@ only when it would otherwise cover owner / repo or the branch chip.
 
 ## Preview
 
-Open `header.html` directly to try the component preview. Selecting an install
+Open `header.html` directly to try the component preview. Its sidebar loads
+[`INSTALL-LIST.md`](../../../INSTALL-LIST.md) at startup through the shared
+[`install-list.js`](../../js/install-list.js) loader, also used by the standalone
+config editor. Local file reads require browser file-access permission.
+Selecting an install
 in the sidebar fetches that repository's real `tootoo.config.js` and applies it
 the way the app does: built-in defaults first, then the install's values. The
-header and the preview settings update to match. Settings the controls don't
-cover (favicon, hidden files and folders, `homeUrl`, …) are listed read-only
-below them, and keys set more than once are flagged. The file is read as data,
+header and a single editable setting/value table update to match. All built-in
+settings and unknown config keys are included. Explicit install values and edits
+are bold; inherited defaults are muted. Empty strings, `false`, empty arrays, and
+`null` remain explicit when present in the file. Use default removes an override;
+unknown keys can be removed. Arrays and objects use JSON, with visible validation
+errors. Keys set more than once are flagged. The file is read as data,
 never executed. The preview also looks up whether the repo and the owner's
 `github.io` site are published (what the app learns from repo details it
 fetches anyway), so the owner / repo links match the app. Private repositories need a token, set with **⚙️**. The preview
@@ -48,3 +55,15 @@ again restores the preview. The page stubs the few content/sidebar helpers those
 panels call, so the About panel's self-test button only points you to the full
 app. The assembled app includes the marked HTML fragment and the JavaScript
 source separately.
+
+Font preset buttons update `headingFont` and `headingFontUrl`, the live header,
+and the downloadable config. None clears both fields. `faviconFile` selects an
+existing icon file or URL; an empty field displays `none` and hides the icon marks.
+Relative icon filenames are resolved against the selected install's Pages URL.
+`homeUrl` controls the optional home link. Non-header settings are editable but
+have no visible tree/footer effect in this standalone header page.
+
+**Download tootoo.config.js** exports explicit values and edits, including unknown
+keys, but omits inherited defaults. Invalid edits block downloading. The preview
+keeps its own runtime storage prefix while exporting the install's actual
+`storagePrefix`. Downloads do not overwrite repository files or publish changes.

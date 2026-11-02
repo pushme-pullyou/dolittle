@@ -592,6 +592,7 @@
     </div>
   </footer>
 
+  <script src="../src/js/install-list.js"></script>
   <script>
     const form = document.getElementById( 'configForm' );
     const output = document.getElementById( 'output' );
@@ -608,25 +609,6 @@
     ];
     const listFields = [ 'hiddenFolders', 'hiddenFiles' ];
     let installRequest = 0;
-    // Keep this selection list aligned with INSTALL-LIST.md and header.html's preview menu.
-    const installs = [
-      { name: 'heritage-happenings.github.io', owner: 'heritage-happenings', repo: 'heritage-happenings.github.io' },
-      { name: 'heritage-happenings-documents', owner: 'heritage-happenings', repo: 'documents' },
-      { name: 'pushme-pullyou-assets', owner: 'pushme-pullyou', repo: 'assets' },
-      { name: 'pushme-pullyou-github-2019', owner: 'pushme-pullyou', repo: '2019' },
-      { name: 'pushme-pullyou-github-io', owner: 'pushme-pullyou', repo: 'pushme-pullyou.github.io' },
-      { name: 'theo-armour-2025', owner: 'theo-armour', repo: '2025' },
-      { name: 'theo-armour-2026', owner: 'theo-armour', repo: '2026' },
-      { name: 'theo-armour-aa', owner: 'theo-armour', repo: 'aa' },
-      { name: 'theo-armour-agenda', owner: 'theo-armour', repo: 'agenda' },
-      { name: 'theo-armour-collection', owner: 'theo-armour', repo: 'collection' },
-      { name: 'theo-armour-genealogy', owner: 'theo-armour', repo: 'genealogy' },
-      { name: 'theo-armour-pages', owner: 'theo-armour', repo: 'pages' },
-      { name: 'theo-armour-qdata', owner: 'theo-armour', repo: 'qdata' },
-      { name: 'theo-armour-sandbox', owner: 'theo-armour', repo: 'sandbox' },
-      { name: 'theo-armour-wikitheo', owner: 'theo-armour', repo: 'wikitheo' },
-      { name: 'tech', owner: 'heritage-happenings', repo: 'tech' }
-    ];
 
     const linesToList = ( value ) => value.split( /\r?\n/ ).map( ( line ) => line.trim() ).filter( Boolean );
     const formatValue = ( value ) => JSON.stringify( value );
@@ -720,17 +702,24 @@
       return object();
     };
 
-    const renderInstallChoices = () => {
+    const renderInstallChoices = async () => {
       installSelection.replaceChildren();
-      for ( const install of installs ) {
-        const button = document.createElement( 'button' );
-        button.className = 'install-item';
-        button.type = 'button';
-        button.textContent = install.name;
-        button.title = `${ install.owner }/${ install.repo }`;
-        button.setAttribute( 'aria-pressed', 'false' );
-        button.addEventListener( 'click', () => loadInstall( install ) );
-        installSelection.append( button );
+      installStatus.textContent = 'Loading INSTALL-LIST.md...';
+      try {
+        const installs = await fetchInstallList( '../INSTALL-LIST.md' );
+        for ( const install of installs ) {
+          const button = document.createElement( 'button' );
+          button.className = 'install-item';
+          button.type = 'button';
+          button.textContent = install.name;
+          button.title = `${ install.owner }/${ install.repo }`;
+          button.setAttribute( 'aria-pressed', 'false' );
+          button.addEventListener( 'click', () => loadInstall( install ) );
+          installSelection.append( button );
+        }
+        installStatus.textContent = 'Select an install to read its config.';
+      } catch ( error ) {
+        installStatus.textContent = `Couldn't load INSTALL-LIST.md: ${ error.message }. Check the file and local file access permissions.`;
       }
     };
 

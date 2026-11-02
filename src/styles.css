@@ -176,6 +176,23 @@ header {
   font-size: 0.9rem;
   color: var(--highlight-fg);
   white-space: nowrap;
+  /* The one part of the header that gives way: a zero basis means it never forces a
+     wrap, and it grows into whatever room is left, so on a narrowing screen the
+     buttons slide over it (ending in …) before anything moves to a second row. */
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The right-hand buttons travel as one group: pushed right, never shrunk, and
+   wrapped to their own row only when they would otherwise cover owner / repo. */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* Keep owner and repo each on one line, so a long "owner / repo" title may break
@@ -265,10 +282,6 @@ button.secondary:active,
 .header-btn.active {
   background: var(--highlight-fg);
   color: var(--on-highlight);
-}
-
-.dark-mode-btn {
-  margin-left: auto;
 }
 
 /* Sidebar toggle (☰): hide sidebar + resizer when body.sidebar-hidden. */

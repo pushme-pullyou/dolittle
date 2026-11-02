@@ -179,15 +179,19 @@
 
     <span id="headerSubtitle" class="header-subtitle" hidden></span>
 
-    <button id="btnDarkMode" class="header-btn dark-mode-btn" title="Toggle Dark Mode"
-      aria-label="Toggle dark mode" aria-pressed="false">🌙</button>
-    <button id="btnFontDec" class="header-btn" title="Decrease Font Size" aria-label="Decrease font size">A−</button>
-    <button id="btnFontInc" class="header-btn" title="Increase Font Size" aria-label="Increase font size">A+</button>
-    <button id="btnHelp" class="header-btn" title="About this app" aria-label="About this app"
-      aria-pressed="false">?</button>
-    <button id="btnToken" class="header-btn" title="GitHub API rate limit — click to set a token"
-      aria-label="Set GitHub personal access token" aria-pressed="false">⚙️</button>
-    <div id="rateBadge" class="rate-limit-badge" title="API Rate Limit" aria-live="polite"></div>
+    <!-- One group, so a narrow header moves all the buttons to a second row together
+         rather than splitting them; until then they slide over the subtitle. -->
+    <span class="header-actions">
+      <button id="btnDarkMode" class="header-btn dark-mode-btn" title="Toggle Dark Mode"
+        aria-label="Toggle dark mode" aria-pressed="false">🌙</button>
+      <button id="btnFontDec" class="header-btn" title="Decrease Font Size" aria-label="Decrease font size">A−</button>
+      <button id="btnFontInc" class="header-btn" title="Increase Font Size" aria-label="Increase font size">A+</button>
+      <button id="btnHelp" class="header-btn" title="About this app" aria-label="About this app"
+        aria-pressed="false">?</button>
+      <button id="btnToken" class="header-btn" title="GitHub API rate limit — click to set a token"
+        aria-label="Set GitHub personal access token" aria-pressed="false">⚙️</button>
+      <div id="rateBadge" class="rate-limit-badge" title="API Rate Limit" aria-live="polite"></div>
+    </span>
   </header>
   <!-- @part:header:end -->
 

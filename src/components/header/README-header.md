@@ -21,6 +21,12 @@ navigation, About, and GitHub token controls.
 - **Repo** — its Pages site when known to be published, else the GitHub repo.
 - **⌂** — the hub page in `homeUrl`, when set.
 
+## Layout
+
+The right-hand buttons are one group (`.header-actions`). As the screen narrows
+they slide over the subtitle, which ends in "…". The group moves to a second row
+only when it would otherwise cover owner / repo or the branch chip.
+
 ## Preview
 
 Open `header.html` directly to try the component preview. Selecting an install

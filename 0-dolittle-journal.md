@@ -1,5 +1,14 @@
 # TooToo — Development Journal
 
+## 2026-11-01
+
+* **Config editor** — added a standalone workshop tool at `tools/config-editor.html`
+  to generate per-install `tootoo.config.js` files. It stays outside the assembled
+  app and runs locally without uploading settings. Reshaped it around the TooToo
+  header / sidebar / content / footer: clicking a single install in the sidebar
+  loads its config for inspection and editing in the content pane, and
+  copy/download actions stay in the footer.
+
 ## 2026-10-31
 
 * **Hub harvest** — ported five general-purpose features from Theo's TooToo Hub build

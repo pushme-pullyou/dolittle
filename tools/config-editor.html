@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>TooToo Config Editor</title>
+  <link rel="stylesheet" href="../src/styles.css">
+  <style>
+    :root {
+      color-scheme: light dark;
+      font: 16px/1.5 system-ui, sans-serif;
+      --bg: #f5f7fb;
+      --surface: #fff;
+      --text: #172033;
+      --muted: #596579;
+      --border: #cbd3df;
+      --accent: #2563eb;
+      --code: #101827;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111827;
+        --surface: #1f2937;
+        --text: #e5e7eb;
+        --muted: #aab4c4;
+        --border: #465265;
+        --accent: #60a5fa;
+        --code: #0b1220;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    main {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 0.25rem;
+      font-size: clamp(1.7rem, 4vw, 2.4rem);
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .intro,
+    .hint,
+    .notice {
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+      gap: 1rem;
+      align-items: start;
+      margin-top: 1.5rem;
+    }
+
+    form,
+    .output-panel {
+      display: grid;
+      gap: 1rem;
+    }
+
+    fieldset,
+    .output-panel {
+      min-width: 0;
+      margin: 0;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      background: var(--surface);
+    }
+
+    legend {
+      padding: 0 0.35rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .field {
+      display: grid;
+      gap: 0.25rem;
+      margin-top: 0.8rem;
+    }
+
+    .field:first-of-type {
+      margin-top: 0;
+    }
+
+    label,
+    .field-title {
+      font-weight: 650;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 0.4rem;
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 5rem;
+      resize: vertical;
+    }
+
+    #output {
+      min-height: 30rem;
+      background: var(--code);
+      color: #e5e7eb;
+      font: 0.85rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+      tab-size: 2;
+    }
+
+    .hint {
+      margin: 0;
+      font-size: 0.88rem;
+    }
+
+    .check {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      margin-top: 0.85rem;
+    }
+
+    .check input {
+      margin-top: 0.35rem;
+      accent-color: var(--accent);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    button {
+      padding: 0.55rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 0.45rem;
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    button:hover {
+      filter: brightness(1.08);
+    }
+
+    #status {
+      min-height: 1.5em;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .notice {
+      padding: 0.75rem 1rem;
+      border-left: 3px solid var(--accent);
+      background: var(--surface);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 760px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      #output {
+        min-height: 20rem;
+      }
+    }
+
+    :root {
+      --bg: var(--primary-bg);
+      --surface: var(--secondary-bg);
+      --text: var(--text-color);
+      --muted: color-mix(in srgb, var(--text-color) 65%, transparent);
+      --border: var(--border-color);
+      --accent: var(--highlight-color);
+      --code: #101827;
+    }
+
+    body {
+      color-scheme: light dark;
+      background: var(--primary-bg);
+      color: var(--text-color);
+    }
+
+    body.dark-mode {
+      color-scheme: dark;
+    }
+
+    .app-main {
+      width: auto;
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+    }
+
+    .install-selection {
+      display: grid;
+      align-content: start;
+      gap: 0.15rem;
+      padding: 0.35rem;
+    }
+
+    .install-item {
+      width: 100%;
+      overflow: hidden;
+      padding: 0.4rem 0.6rem;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-color);
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 400;
+      text-align: left;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .install-item:hover,
+    .install-item[aria-pressed="true"] {
+      background: var(--hover-bg);
+      color: var(--highlight-fg);
+      filter: none;
+    }
+
+    .install-item[aria-pressed="true"] {
+      font-weight: 650;
+    }
+
+    .content-area {
+      min-height: 0;
+    }
+
+    .file-header {
+      min-height: 2.25rem;
+    }
+
+    .content-body {
+      flex: 1;
+      padding: 0 1rem 1rem;
+    }
+
+    .content-body > .hint {
+      margin: 0.75rem 0;
+    }
+
+    .install-results {
+      display: grid;
+      gap: 0.75rem;
+      padding-top: 0.75rem;
+    }
+
+    .install-result {
+      min-width: 0;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      background: var(--primary-bg);
+    }
+
+    .install-result h4 {
+      margin: 0 0 0.25rem;
+      font-size: 0.9rem;
+      font-weight: 400;
+      opacity: 0.75;
+    }
+
+    .install-result h3 {
+      margin: 0 0 0.25rem;
+      font-size: 1rem;
+      overflow-wrap: anywhere;
+    }
+
+    .install-result table {
+      width: 100%;
+      margin-top: 0.5rem;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .install-result th,
+    .install-result td {
+      padding: 0.35rem;
+      border-top: 1px solid var(--border-color);
+      text-align: left;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+    }
+
+    .install-result th {
+      width: 32%;
+      font-weight: 650;
+    }
+
+    .install-result pre {
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font: inherit;
+    }
+
+    .editor-details {
+      margin-top: 1rem;
+      border-top: 1px solid var(--border-color);
+      padding-top: 0.75rem;
+    }
+
+    .editor-details > summary {
+      color: var(--highlight-fg);
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 650;
+    }
+
+    .editor-details > p {
+      margin: 0.75rem 0;
+      color: var(--muted);
+    }
+
+    #configForm {
+      display: grid;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    #output {
+      min-height: 12rem;
+    }
+
+    .app-footer {
+      align-items: center;
+    }
+
+    .footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    #status {
+      min-width: 12ch;
+      margin: 0 0.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .sidebar {
+        width: min(45vw, 260px);
+      }
+
+      .header-subtitle {
+        display: none;
+      }
+
+      .app-footer {
+        align-items: flex-start;
+      }
+
+      .footer-actions {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <button id="btnToggleSidebar" class="header-btn" type="button" title="Toggle install list"
+      aria-label="Toggle install list" aria-controls="sidebar" aria-expanded="true">☰</button>
+    <a id="headerGitHub" href="config-editor.html" title="Config editor home" aria-label="Config editor home">
+      <img src="../favicon.ico" width="18" height="18" alt="" aria-hidden="true">
+    </a>
+    <a id="headerTitle" href="config-editor.html" aria-label="TooToo Config Editor">TooToo Config Editor</a>
+    <span class="header-subtitle">Inspect and edit install settings</span>
+    <span class="header-actions">
+      <button id="btnDarkMode" class="header-btn" type="button" title="Toggle dark mode"
+        aria-label="Toggle dark mode" aria-pressed="false">🌙</button>
+    </span>
+  </header>
+
+  <main class="app-main">
+    <aside class="sidebar" id="sidebar" aria-label="TooToo installs">
+      <div class="sidebar-scroll-area">
+        <div class="panel-header"><h3>Installs</h3></div>
+        <nav id="installSelection" class="install-selection" aria-label="Install repositories"></nav>
+      </div>
+    </aside>
+
+    <section class="content-area" id="contentArea" aria-label="Selected install configurations">
+      <div class="panel-header file-header">
+        <h3 id="contentHeading">Install settings</h3>
+        <p id="installStatus" class="hint" role="status" aria-live="polite">Choose an install from the sidebar.</p>
+      </div>
+      <div id="contentBody" class="content-body">
+        <div id="installResults" class="install-results" aria-live="polite">
+          <p class="hint">Choose a single install in the sidebar to inspect and edit its settings.</p>
+        </div>
+
+        <details id="editorDetails" class="editor-details">
+          <summary>Edit or create a config</summary>
+          <p>Settings stay in this browser. Download the generated file and place it beside the install's <code>index.html</code>.</p>
+          <form id="configForm">
+        <fieldset>
+          <legend>Repository to browse</legend>
+          <div class="field">
+            <label for="owner">GitHub owner</label>
+            <input id="owner" name="owner" type="text" autocomplete="off" placeholder="theo-armour">
+            <p class="hint">Leave owner and repository blank to let TooToo detect them.</p>
+          </div>
+          <div class="field">
+            <label for="repo">Repository</label>
+            <input id="repo" name="repo" type="text" autocomplete="off" placeholder="pages">
+          </div>
+          <div class="field">
+            <label for="branch">Branch</label>
+            <input id="branch" name="branch" type="text" autocomplete="off" placeholder="Default branch">
+            <p class="hint">Leave blank to use the repository's default branch.</p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Identity and links</legend>
+          <div class="field">
+            <label for="appName">App name</label>
+            <input id="appName" name="appName" type="text" placeholder="TooToo">
+          </div>
+          <div class="field">
+            <label for="subtitle">Subtitle</label>
+            <input id="subtitle" name="subtitle" type="text" placeholder="Single-file GitHub repository browser">
+          </div>
+          <div class="field">
+            <label for="sourceRepoUrl">Source repository URL</label>
+            <input id="sourceRepoUrl" name="sourceRepoUrl" type="url" placeholder="https://github.com/pushme-pullyou/tootoo">
+            <p class="hint">Used by the Source link in the About panel.</p>
+          </div>
+          <div class="field">
+            <label for="homeUrl">Home page URL</label>
+            <input id="homeUrl" name="homeUrl" type="url" placeholder="https://example.github.io">
+            <p class="hint">Adds a home link in the header when provided.</p>
+          </div>
+          <div class="field">
+            <label for="storagePrefix">Browser storage prefix</label>
+            <input id="storagePrefix" name="storagePrefix" type="text" placeholder="tootoo">
+            <p class="hint">Use a unique prefix if multiple TooToo installs share a browser.</p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Branding</legend>
+          <div class="field">
+            <label for="themeColor">Theme color</label>
+            <input id="themeColor" name="themeColor" type="text" placeholder="#3a8856">
+            <p class="hint">Any CSS color value, for example <code>#3a8856</code> or <code>rebeccapurple</code>.</p>
+          </div>
+          <div class="field">
+            <label for="headingFontUrl">Heading font URL</label>
+            <input id="headingFontUrl" name="headingFontUrl" type="url" placeholder="https://fonts.googleapis.com/css2?family=Fraunces">
+            <p class="hint">A font stylesheet URL or a direct font file URL.</p>
+          </div>
+          <div class="field">
+            <label for="headingFont">Heading font family</label>
+            <input id="headingFont" name="headingFont" type="text" placeholder='"Fraunces", serif'>
+            <p class="hint">CSS font-family syntax, including quotes when needed.</p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Footer rights</legend>
+          <div class="field">
+            <label for="rightsText">Rights text</label>
+            <input id="rightsText" name="rightsText" type="text" placeholder="No rights reserved">
+          </div>
+          <div class="field">
+            <label for="rightsScope">Show rights text for</label>
+            <select id="rightsScope" name="rightsScope">
+              <option value="all">All repository owners</option>
+              <option value="listed">Only the listed owners</option>
+              <option value="none">No owners</option>
+            </select>
+            <p class="hint">The default is all owners. Use an owner list to limit the rights line to accounts you specify.</p>
+          </div>
+          <div class="field" id="rightsOwnersField" hidden>
+            <label for="rightsOwners">GitHub owners, one per line</label>
+            <textarea id="rightsOwners" name="rightsOwners" placeholder="theo-armour&#10;pushme-pullyou"></textarea>
+            <p class="hint">An empty list means the rights text is never shown.</p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Browsing</legend>
+          <div class="field">
+            <label for="hiddenFolders">Hidden folders, one name per line</label>
+            <textarea id="hiddenFolders" name="hiddenFolders" placeholder="Images&#10;private-assets"></textarea>
+            <p class="hint">This list replaces the built-in list; leave blank to hide no extra folders.</p>
+          </div>
+          <div class="field">
+            <label for="hiddenFiles">Hidden files, one name per line</label>
+            <textarea id="hiddenFiles" name="hiddenFiles">tootoo.config.js</textarea>
+            <p class="hint">Use <code>/name</code> to hide a file only at the repository root.</p>
+            <p class="hint">This list replaces the built-in list. The default keeps this config file hidden; remove it if you want to show the file in the tree.</p>
+          </div>
+          <label class="check">
+            <input id="hideDatedBackups" name="hideDatedBackups" type="checkbox">
+            <span>Hide files recognized as dated backups from the tree</span>
+          </label>
+          <label class="check">
+            <input id="preferPagesUrls" name="preferPagesUrls" type="checkbox">
+            <span>Prefer GitHub Pages URLs for this install's owner</span>
+          </label>
+          <label class="check">
+            <input id="autoOpenFolderReadme" name="autoOpenFolderReadme" type="checkbox" checked>
+            <span>Open a folder's README the first time I expand it</span>
+          </label>
+        </fieldset>
+          </form>
+          <section class="output-panel" aria-labelledby="outputHeading">
+            <h2 id="outputHeading">Generated file</h2>
+            <label for="output">Preview: <code>tootoo.config.js</code></label>
+            <textarea id="output" readonly spellcheck="false" aria-live="polite"></textarea>
+          </section>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span class="app-footer-brand">
+      <img class="app-footer-mark" src="../favicon.ico" width="18" height="18" alt="">
+      <span>TooToo Config Editor · settings remain local</span>
+    </span>
+    <div class="footer-actions">
+      <p id="status" role="status" aria-live="polite">Ready.</p>
+      <button id="copy" type="button">Copy</button>
+      <button id="reset" type="button">Reset</button>
+      <button class="primary" id="download" type="button">Download config</button>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById( 'configForm' );
+    const output = document.getElementById( 'output' );
+    const status = document.getElementById( 'status' );
+    const rightsScope = document.getElementById( 'rightsScope' );
+    const rightsOwnersField = document.getElementById( 'rightsOwnersField' );
+    const installSelection = document.getElementById( 'installSelection' );
+    const installStatus = document.getElementById( 'installStatus' );
+    const installResults = document.getElementById( 'installResults' );
+    const contentHeading = document.getElementById( 'contentHeading' );
+    const stringFields = [
+      'owner', 'repo', 'branch', 'appName', 'subtitle', 'sourceRepoUrl', 'homeUrl',
+      'storagePrefix', 'themeColor', 'headingFontUrl', 'headingFont', 'rightsText'
+    ];
+    const listFields = [ 'hiddenFolders', 'hiddenFiles' ];
+    let installRequest = 0;
+    // Keep this selection list aligned with INSTALL-LIST.md and header.html's preview menu.
+    const installs = [
+      { name: 'heritage-happenings.github.io', owner: 'heritage-happenings', repo: 'heritage-happenings.github.io' },
+      { name: 'heritage-happenings-documents', owner: 'heritage-happenings', repo: 'documents' },
+      { name: 'pushme-pullyou-assets', owner: 'pushme-pullyou', repo: 'assets' },
+      { name: 'pushme-pullyou-github-2019', owner: 'pushme-pullyou', repo: '2019' },
+      { name: 'pushme-pullyou-github-io', owner: 'pushme-pullyou', repo: 'pushme-pullyou.github.io' },
+      { name: 'theo-armour-2025', owner: 'theo-armour', repo: '2025' },
+      { name: 'theo-armour-2026', owner: 'theo-armour', repo: '2026' },
+      { name: 'theo-armour-aa', owner: 'theo-armour', repo: 'aa' },
+      { name: 'theo-armour-agenda', owner: 'theo-armour', repo: 'agenda' },
+      { name: 'theo-armour-collection', owner: 'theo-armour', repo: 'collection' },
+      { name: 'theo-armour-genealogy', owner: 'theo-armour', repo: 'genealogy' },
+      { name: 'theo-armour-pages', owner: 'theo-armour', repo: 'pages' },
+      { name: 'theo-armour-qdata', owner: 'theo-armour', repo: 'qdata' },
+      { name: 'theo-armour-sandbox', owner: 'theo-armour', repo: 'sandbox' },
+      { name: 'theo-armour-wikitheo', owner: 'theo-armour', repo: 'wikitheo' },
+      { name: 'tech', owner: 'heritage-happenings', repo: 'tech' }
+    ];
+
+    const linesToList = ( value ) => value.split( /\r?\n/ ).map( ( line ) => line.trim() ).filter( Boolean );
+    const formatValue = ( value ) => JSON.stringify( value );
+
+    const parseConfigLiteral = ( source ) => {
+      const start = source.search( /TOOTOO_CONFIG\s*=\s*\{/ );
+      if ( start < 0 ) throw new Error( 'No TOOTOO_CONFIG object found.' );
+      let index = source.indexOf( '{', start );
+      const fail = ( message ) => { throw new Error( `${ message } (line ${ source.slice( 0, index ).split( '\n' ).length })` ); };
+      const skip = () => {
+        for ( ; ; ) {
+          if ( /\s/.test( source[ index ] || '' ) ) index++;
+          else if ( source.startsWith( '//', index ) ) {
+            const end = source.indexOf( '\n', index );
+            index = end < 0 ? source.length : end;
+          } else if ( source.startsWith( '/*', index ) ) {
+            const end = source.indexOf( '*/', index + 2 );
+            if ( end < 0 ) fail( 'Unclosed comment' );
+            index = end + 2;
+          } else return;
+        }
+      };
+      const string = () => {
+        const quote = source[ index++ ];
+        let value = '';
+        while ( index < source.length && source[ index ] !== quote && source[ index ] !== '\n' ) {
+          let char = source[ index++ ];
+          if ( char === '\\' ) {
+            char = source[ index++ ];
+            const digits = char === 'u' ? 4 : char === 'x' ? 2 : 0;
+            if ( digits ) {
+              const hex = source.slice( index, index + digits );
+              if ( !new RegExp( `^[0-9a-f]{${ digits }}$`, 'i' ).test( hex ) ) fail( 'Invalid string escape' );
+              char = String.fromCharCode( parseInt( hex, 16 ) );
+              index += digits;
+            } else {
+              char = ( { n: '\n', r: '\r', t: '\t', b: '\b', f: '\f', v: '\v', 0: '\0' } )[ char ] ?? char;
+            }
+          }
+          value += char;
+        }
+        if ( source[ index ] !== quote ) fail( 'Unterminated string' );
+        index++;
+        return value;
+      };
+      const value = () => {
+        skip();
+        const char = source[ index ];
+        if ( char === '"' || char === "'" ) return string();
+        if ( char === '{' ) return object();
+        if ( char === '[' ) {
+          index++;
+          const result = [];
+          for ( ; ; ) {
+            skip();
+            if ( source[ index ] === ']' ) { index++; return result; }
+            result.push( value() );
+            skip();
+            if ( source[ index ] === ',' ) index++;
+            else if ( source[ index ] !== ']' ) fail( 'Expected "," or "]"' );
+          }
+        }
+        const literal = /^(?:true|false|null|-?\d+(?:\.\d+)?)(?![\w$.])/.exec( source.slice( index ) )?.[ 0 ];
+        if ( !literal ) fail( 'Only plain configuration values can be read' );
+        index += literal.length;
+        return JSON.parse( literal );
+      };
+      const object = () => {
+        index++;
+        const result = Object.create( null );
+        for ( ; ; ) {
+          skip();
+          if ( source[ index ] === '}' ) { index++; return result; }
+          let key;
+          if ( source[ index ] === '"' || source[ index ] === "'" ) key = string();
+          else {
+            key = /^[A-Za-z_$][\w$]*/.exec( source.slice( index ) )?.[ 0 ];
+            if ( !key ) fail( 'Expected a setting name' );
+            index += key.length;
+          }
+          if ( key === '__proto__' ) fail( 'Unsupported setting name' );
+          skip();
+          if ( source[ index ] !== ':' ) fail( `Expected ":" after ${ key }` );
+          index++;
+          result[ key ] = value();
+          skip();
+          if ( source[ index ] === ',' ) index++;
+          else if ( source[ index ] !== '}' ) fail( 'Expected "," or "}"' );
+        }
+      };
+      return object();
+    };
+
+    const renderInstallChoices = () => {
+      installSelection.replaceChildren();
+      for ( const install of installs ) {
+        const button = document.createElement( 'button' );
+        button.className = 'install-item';
+        button.type = 'button';
+        button.textContent = install.name;
+        button.title = `${ install.owner }/${ install.repo }`;
+        button.setAttribute( 'aria-pressed', 'false' );
+        button.addEventListener( 'click', () => loadInstall( install ) );
+        installSelection.append( button );
+      }
+    };
+
+    const setEditorFromConfig = ( values, install ) => {
+      form.reset();
+      for ( const key of stringFields ) {
+        if ( values[ key ] != null && typeof values[ key ] !== 'object' ) form.elements[ key ].value = String( values[ key ] );
+      }
+      for ( const key of listFields ) {
+        if ( Array.isArray( values[ key ] ) ) form.elements[ key ].value = values[ key ].join( '\n' );
+      }
+      if ( values.rightsOwners === null ) rightsScope.value = 'all';
+      else if ( Array.isArray( values.rightsOwners ) ) {
+        rightsScope.value = values.rightsOwners.length ? 'listed' : 'none';
+        form.elements.rightsOwners.value = values.rightsOwners.join( '\n' );
+      }
+      for ( const key of [ 'hideDatedBackups', 'preferPagesUrls' ] ) {
+        form.elements[ key ].checked = values[ key ] === true;
+      }
+      form.elements.autoOpenFolderReadme.checked = values.autoOpenFolderReadme !== false;
+      if ( !values.owner ) form.elements.owner.value = install.owner;
+      if ( !values.repo ) form.elements.repo.value = install.repo;
+      render();
+      document.getElementById( 'editorDetails' ).open = true;
+      status.textContent = `Loaded ${ install.name } settings into the editor.`;
+      form.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+    };
+
+    const resetEditorForInstall = ( install ) => {
+      form.reset();
+      form.elements.owner.value = install.owner;
+      form.elements.repo.value = install.repo;
+      render();
+      document.getElementById( 'editorDetails' ).open = true;
+    };
+
+    const renderInstallResult = ( install, result ) => {
+      const card = document.createElement( 'article' );
+      card.className = 'install-result';
+      const title = document.createElement( 'h3' );
+      title.textContent = install.name;
+      const repository = document.createElement( 'h4' );
+      repository.textContent = `${ install.owner }/${ install.repo }`;
+      const state = document.createElement( 'p' );
+      state.className = 'hint';
+      state.textContent = result.error || `${ Object.keys( result.values ).length } explicit setting(s)`;
+      card.append( title, repository, state );
+      if ( result.values ) {
+        const table = document.createElement( 'table' );
+        const body = document.createElement( 'tbody' );
+        for ( const [ key, value ] of Object.entries( result.values ) ) {
+          const row = document.createElement( 'tr' );
+          const heading = document.createElement( 'th' );
+          heading.scope = 'row';
+          heading.textContent = key;
+          const cell = document.createElement( 'td' );
+          const pre = document.createElement( 'pre' );
+          pre.textContent = JSON.stringify( value, null, 2 );
+          cell.append( pre );
+          row.append( heading, cell );
+          body.append( row );
+        }
+        if ( !Object.keys( result.values ).length ) {
+          const row = document.createElement( 'tr' );
+          const cell = document.createElement( 'td' );
+          cell.colSpan = 2;
+          cell.textContent = 'No overrides; TooToo defaults are in use.';
+          row.append( cell );
+          body.append( row );
+        }
+        table.append( body );
+        card.append( table );
+      }
+      installResults.replaceChildren( card );
+    };
+
+    const inspectInstall = async ( install ) => {
+      const url = `https://raw.githubusercontent.com/${ encodeURIComponent( install.owner ) }/${ encodeURIComponent( install.repo ) }/HEAD/tootoo.config.js`;
+      const response = await fetch( url, { cache: 'no-store' } );
+      if ( response.status === 404 ) return { error: 'Config not found or repository is private.' };
+      if ( !response.ok ) throw new Error( `GitHub returned HTTP ${ response.status }.` );
+      return { values: parseConfigLiteral( await response.text() ) };
+    };
+
+    const loadInstall = async ( install ) => {
+      const request = ++installRequest;
+      for ( const button of installSelection.querySelectorAll( '.install-item' ) ) {
+        button.setAttribute( 'aria-pressed', String( button.textContent === install.name ) );
+      }
+      contentHeading.textContent = install.name;
+      installResults.replaceChildren();
+      installStatus.textContent = `Loading ${ install.name }…`;
+      try {
+        const result = await inspectInstall( install );
+        if ( request !== installRequest ) return;
+        renderInstallResult( install, result );
+        if ( result.values ) {
+          setEditorFromConfig( result.values, install );
+          installStatus.textContent = `Loaded ${ install.name }.`;
+        } else {
+          resetEditorForInstall( install );
+          installStatus.textContent = `${ install.name }: ${ result.error }`;
+        }
+      } catch ( error ) {
+        if ( request !== installRequest ) return;
+        const result = { error: error.message || 'Could not load config.' };
+        renderInstallResult( install, result );
+        resetEditorForInstall( install );
+        installStatus.textContent = `${ install.name }: ${ result.error }`;
+      }
+    };
+
+    const buildConfig = () => {
+      const entries = [];
+      for ( const key of stringFields ) {
+        const value = form.elements[ key ].value.trim();
+        if ( value ) entries.push( `  ${ key }: ${ formatValue( value ) }` );
+      }
+      for ( const key of listFields ) {
+        const values = linesToList( form.elements[ key ].value );
+        entries.push( `  ${ key }: ${ formatValue( values ) }` );
+      }
+
+      if ( rightsScope.value === 'listed' ) {
+        entries.push( `  rightsOwners: ${ formatValue( linesToList( form.elements.rightsOwners.value ) ) }` );
+      } else if ( rightsScope.value === 'none' ) {
+        entries.push( '  rightsOwners: []' );
+      }
+
+      for ( const key of [ 'hideDatedBackups', 'preferPagesUrls' ] ) {
+        if ( form.elements[ key ].checked ) entries.push( `  ${ key }: true` );
+      }
+      if ( !form.elements.autoOpenFolderReadme.checked ) entries.push( '  autoOpenFolderReadme: false' );
+
+      return `window.TOOTOO_CONFIG = {\n${ entries.join( ',\n' ) }\n};\n`;
+    };
+
+    const render = () => {
+      rightsOwnersField.hidden = rightsScope.value !== 'listed';
+      output.value = buildConfig();
+    };
+
+    form.addEventListener( 'input', render );
+    form.addEventListener( 'change', render );
+    document.getElementById( 'btnToggleSidebar' ).addEventListener( 'click', ( event ) => {
+      document.body.classList.toggle( 'sidebar-hidden' );
+      event.currentTarget.setAttribute( 'aria-expanded', String( !document.body.classList.contains( 'sidebar-hidden' ) ) );
+    } );
+    document.getElementById( 'btnDarkMode' ).addEventListener( 'click', ( event ) => {
+      const dark = document.body.classList.toggle( 'dark-mode' );
+      event.currentTarget.setAttribute( 'aria-pressed', String( dark ) );
+      event.currentTarget.textContent = dark ? '☀️' : '🌙';
+    } );
+    document.getElementById( 'download' ).addEventListener( 'click', () => {
+      if ( !form.reportValidity() ) return;
+      const file = new Blob( [ output.value ], { type: 'text/javascript;charset=utf-8' } );
+      const url = URL.createObjectURL( file );
+      const link = document.createElement( 'a' );
+      link.href = url;
+      link.download = 'tootoo.config.js';
+      document.body.appendChild( link );
+      link.click();
+      link.remove();
+      setTimeout( () => URL.revokeObjectURL( url ), 1000 );
+      status.textContent = 'Downloaded tootoo.config.js.';
+    } );
+    document.getElementById( 'copy' ).addEventListener( 'click', async () => {
+      if ( !form.reportValidity() ) return;
+      try {
+        await navigator.clipboard.writeText( output.value );
+        status.textContent = 'Copied config code to the clipboard.';
+      } catch ( error ) {
+        status.textContent = `Could not copy to clipboard: ${ error.message || 'clipboard access is unavailable' }. Use Download config file instead.`;
+      }
+    } );
+    document.getElementById( 'reset' ).addEventListener( 'click', () => {
+      form.reset();
+      status.textContent = 'Form reset.';
+      render();
+    } );
+
+    renderInstallChoices();
+    render();
+  </script>
+</body>
+
+</html>

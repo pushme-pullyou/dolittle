@@ -45,6 +45,7 @@ tootoo-test.html              ← standalone test harness for pure helpers
 tootoo-test-load.html         ← manual GitHub raw-file load tester
 tootoo-test-regressions.html  ← browser regression checks against the assembled app
 tootoo-reference.html         ← frozen pre-carve single-file app, kept for reference
+tools/                        ← standalone workshop tools, including the config editor
 ```
 
 ## The family

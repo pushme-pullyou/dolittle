@@ -16,8 +16,8 @@ and default preview branch with each path; folder names need not match repo name
 | `g:\My Drive\2026-theo-github\heritage-happenings.github.io\index.html` | heritage-happenings/heritage-happenings.github.io | master |
 | `G:\My Drive\2026-theo-github\heritage-happenings-documents\index.html` | heritage-happenings/documents | main |
 | `g:\My Drive\2026-theo-github\pushme-pullyou-assets\index.html` | pushme-pullyou/assets | main |
-| `g:\My Drive\2026-theo-github\pushme-pullyou-github-dolittle\index.html` | pushme-pullyou/dolittle | main |
 | `g:\My Drive\2026-theo-github\pushme-pullyou-github-io\index.html` | pushme-pullyou/pushme-pullyou.github.io | main |
+| `g:\My Drive\2026-theo-github\theo-armour-github-io\index.html` | theo-armour/github-io | main |
 | `g:\My Drive\2026-theo-github\theo-armour-2025\index.html` | theo-armour/2025 | main |
 | `g:\My Drive\2026-theo-github\theo-armour-2026\index.html` | theo-armour/2026 | main |
 | `g:\My Drive\2026-theo-github\theo-armour-aa\index.html` | theo-armour/aa | main |

@@ -152,6 +152,28 @@
         ] );
         renderTree( unusual );
         check( 'Prototype-like folder names render normally', document.querySelectorAll( '#treeList .tree-item' ).length === 3 );
+        renderTree( [
+          { path: 'z-last.txt', type: 'blob', size: 1 },
+          { path: 'README RFP.md', type: 'blob', size: 1 },
+          { path: 'docs', type: 'tree' },
+          { path: 'README.md-2026-11-01', type: 'blob', size: 1 },
+          { path: 'docs/b-last.txt', type: 'blob', size: 1 },
+          { path: 'docs/README RFP.md', type: 'blob', size: 1 },
+          { path: 'docs/README.md-2026-11-01', type: 'blob', size: 1 },
+          { path: 'docs/sub', type: 'tree' },
+          { path: 'docs/a-first.txt', type: 'blob', size: 1 }
+        ] );
+        const rootEntries = Array.from( document.querySelector( '#treeList' ).children )
+          .filter( ( item ) => item.classList.contains( 'tree-item' ) || item.matches( 'details' ) )
+          .map( ( item ) => item.dataset.path || item.dataset.folderPath );
+        const docs = document.querySelector( '#treeList > details[data-folder-path="docs"]' );
+        const docsEntries = Array.from( docs.children )
+          .filter( ( item ) => item.classList.contains( 'tree-item' ) || item.matches( 'details' ) )
+          .map( ( item ) => item.dataset.path || item.dataset.folderPath );
+        check( 'README-prefixed files sort first among root files, including dated suffixes',
+          rootEntries.join( ',' ) === 'docs,README RFP.md,README.md-2026-11-01,z-last.txt' );
+        check( 'README-prefixed files sort first among nested files after folders',
+          docsEntries.join( ',' ) === 'docs/sub,docs/README RFP.md,docs/README.md-2026-11-01,docs/a-first.txt,docs/b-last.txt' );
         for ( const hasSubfolder of [ false, true ] ) {
           renderTree( [ { path: 'docs', type: 'tree' }, ...( hasSubfolder ? [ { path: 'docs/sub', type: 'tree' } ] : [] ), { path: hasSubfolder ? 'docs/sub/next.txt' : 'docs/next.txt', type: 'blob', size: 1 } ] );
           const folder = document.querySelector( 'details[data-folder-path="docs"]' ); folder.open = true;

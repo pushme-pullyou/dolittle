@@ -333,7 +333,15 @@ main {
   padding: 0;
   overflow: hidden;
   container-type: inline-size;
-  position: relative;   /* anchors the floating #btnTreeTop over the tree */
+  position: relative;   /* anchors the floating #btnTreeTop over the sidebar */
+}
+
+.sidebar-scroll-area {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 @container (max-width: 220px) {
@@ -516,19 +524,7 @@ main {
 /* ── Tree list ── */
 #treeList {
   padding: 0 0.5rem;
-  flex: 1;
-  overflow-y: auto;
-}
-
-/* ── Sidebar footer ── */
-.sidebar-footer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.15rem;
-  border-top: 1px solid var(--border-color);
-  background: var(--primary-bg);
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 /* ── Resizer ── */
@@ -710,8 +706,7 @@ details {
   justify-content: center;
 }
 
-/* the sidebar's ↑ shares .back-to-top's look; this modifier shrinks it and floats
-   it over the tree, just above the sidebar footer */
+/* the sidebar's ↑ shares .back-to-top's look and floats over the scroll area */
 .panel-to-top {
   font-size: 1rem;
   height: 1.9rem;
@@ -720,7 +715,7 @@ details {
 
 #btnTreeTop {
   position: absolute;
-  bottom: 2.6rem;
+  bottom: 0.9rem;
   right: 0.9rem;
 }
 

@@ -52,23 +52,20 @@
   <main>
     <!-- @part:sidebar:start -->
     <div class="sidebar" id="sidebar">
-      <div class="panel-header" id="filesPanelHeader">
-        <h3 id="hFiles">Files</h3>
-        <button id="btnExpandAll" class="file-btn" style="display: none;" title="Expand all folders"
-          aria-label="Expand all folders">⊞</button>
+      <div class="sidebar-scroll-area" id="sidebarScrollArea">
+        <div class="panel-header" id="filesPanelHeader">
+          <h3 id="hFiles">Files</h3>
+          <button id="btnExpandAll" class="file-btn" style="display: none;" title="Expand all folders"
+            aria-label="Expand all folders">⊞</button>
+        </div>
+        <div class="filter-wrap">
+          <label for="treeFilter" class="sr-only">Filter files by name</label>
+          <input type="text" id="treeFilter" placeholder="Filter files…" title="Filter files by name">
+          <button id="btnFilterClear" title="Clear filter" aria-label="Clear filter">✕</button>
+        </div>
+        <div id="treeList"></div>
       </div>
-      <div class="filter-wrap">
-        <label for="treeFilter" class="sr-only">Filter files by name</label>
-        <input type="text" id="treeFilter" placeholder="Filter files…" title="Filter files by name">
-        <button id="btnFilterClear" title="Clear filter" aria-label="Clear filter">✕</button>
-      </div>
-      <div id="treeList"></div>
-      <button id="btnTreeTop" class="back-to-top panel-to-top" title="Scroll files to top" aria-label="Scroll files to top">↑</button>
-      <div class="sidebar-footer">
-        <button id="btnScrollTreeTop" type="button" title="Scroll sidebar to top" aria-label="Scroll sidebar to top">
-          <img src="favicon.ico" alt="" width="20" height="20">
-        </button>
-      </div>
+      <button id="btnTreeTop" class="back-to-top panel-to-top" title="Scroll sidebar to top" aria-label="Scroll sidebar to top">↑</button>
     </div>
     <!-- @part:sidebar:end -->
 
@@ -105,7 +102,7 @@
   <script src="../../mock/mock-data.js"></script>
   <script src="sidebar.js"></script>
 
-  <!-- Dev harness: the Content stub + footer icon + resizer drag + init.
+  <!-- Dev harness: the Content stub + resizer drag + init.
        None of this is part of the sidebar component. -->
   <script>
     // Content owns currentFilePath; here it's a stub that just shows the hand-off.
@@ -117,11 +114,7 @@
       document.getElementById( 'devSelected' ).textContent = path;
     };
 
-    // Footer icon, scroll-to-top, and resizer drag now live in sidebar.js (initSidebar).
     initSidebar();
-    // Standalone page: the footer mark's static src="favicon.ico" resolves relative to
-    // this file (src/components/sidebar/), so point it at the dev folder's generated one.
-    document.querySelector( '#btnScrollTreeTop img' ).src = '../../../favicon.ico';
   </script>
 
 </body>

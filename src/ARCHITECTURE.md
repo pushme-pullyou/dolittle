@@ -72,10 +72,10 @@ keeps its markup, behavior, and notes together in a named folder under
 - **Sections:** §31–§38, §12b.
 
 ### ⬜ Footer — branding / identity
-- **Owns DOM:** the sidebar-footer mark.
+- **Owns DOM:** the content-area copyright/rights and license footer.
 - **Reads:** `CONFIG.rightsText/rightsOwners`, `state.owner`.
 - **Exposes:** `renderFooter()`.
-- **Sections:** CSS "Sidebar footer".
+- **Sections:** CSS "Footer".
 
 ### ⚙️ core — state + services (no DOM)
 - **Owns:** `CONFIG`, the `state` object, utilities, storage keys, blob tracking,

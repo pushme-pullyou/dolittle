@@ -6,8 +6,8 @@
    Depends on core.js helpers + globals CONFIG/state (mock-data.js in the preview).
    renderTree is synchronous (the reference batched huge repos with a "% rendered" status). */
 
-/* README matcher — shared by root auto-open, folder auto-open, and bold styling. */
-const README_RE = /^readme(\.\w+)?$/i;   // README, README.md, readme.txt — not README-2026-….md backups
+/* README matcher — shared by sorting, root/folder auto-open, and bold styling. */
+const README_RE = /^readme/i;
 
 /* ── build nested tree from the flat GitHub list ── */
 const buildNestedTree = ( flatTree ) => {
@@ -105,9 +105,19 @@ const findLatestPost = ( blogNode, blogPath ) => {
   return { expandPaths, postPath: posts[ 0 ].path };
 };
 
-/* ── sort entries; `mode` (blog context) picks the comparator, else default. ── */
+/* README-prefixed files lead the file group; folders keep their context order. */
 const sortedEntries = ( children, mode ) =>
-  Object.entries( children ).sort( BLOG_CMP[ mode ] || cmpDefault );
+  Object.entries( children ).sort( ( a, b ) => {
+    const compare = BLOG_CMP[ mode ] || cmpDefault;
+    const aFile = !isFolderNode( a[ 1 ] );
+    const bFile = !isFolderNode( b[ 1 ] );
+    if ( aFile && bFile ) {
+      const aReadme = README_RE.test( a[ 0 ] );
+      const bReadme = README_RE.test( b[ 0 ] );
+      if ( aReadme !== bReadme ) return aReadme ? -1 : 1;
+    }
+    return compare( a, b );
+  } );
 
 /* ── recursive folder contents (for the folder tooltip) ──
    Memoized per node: renderNode renders children before asking a parent for its stats, so
@@ -649,25 +659,19 @@ const initSidebar = () => {
     if ( !e.target.closest( '.branch-control' ) ) closeBranchMenu();
   } );
 
-  // Sidebar footer scroll-to-top (its brand mark is static markup → favicon.ico).
-  document.getElementById( 'btnScrollTreeTop' )?.addEventListener( 'click', () =>
-    document.getElementById( 'treeList' ).scrollTo( { top: 0, behavior: 'smooth' } ) );
-
-  // Floating ↑ over the tree, like the content area's: appears once the tree has
-  // scrolled a bit, returns it to the top.
-  const treeList = document.getElementById( 'treeList' );
+  // Show ↑ whenever the sidebar overflows so the scroll affordance is visible immediately.
+  const sidebarScrollArea = document.getElementById( 'sidebarScrollArea' );
   const treeTop = document.getElementById( 'btnTreeTop' );
-  if ( treeList && treeTop ) {
-    let shown = false;   // write style only on show/hide transitions, not every scroll frame
-    treeList.addEventListener( 'scroll', () => {
-      const want = treeList.scrollTop > 150;
-      if ( want === shown ) return;
-      shown = want;
-      treeTop.style.display = want ? 'flex' : 'none';
-    } );
+  if ( sidebarScrollArea && treeTop ) {
+    const updateTreeTopVisibility = () => {
+      treeTop.style.display = sidebarScrollArea.scrollHeight > sidebarScrollArea.clientHeight ? 'flex' : 'none';
+    };
+    updateTreeTopVisibility();
+    new ResizeObserver( updateTreeTopVisibility ).observe( document.getElementById( 'treeList' ) );
+    window.addEventListener( 'resize', updateTreeTopVisibility );
     treeTop.addEventListener( 'click', ( e ) => {
       e.stopPropagation();
-      treeList.scrollTo( { top: 0, behavior: 'smooth' } );
+      sidebarScrollArea.scrollTo( { top: 0, behavior: 'smooth' } );
     } );
   }
 

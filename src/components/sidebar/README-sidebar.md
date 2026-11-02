@@ -15,9 +15,11 @@ includes the marked HTML fragment and the JavaScript source separately.
 
 ## Behaviour
 
-- **Tree:** folders first, then files, alphabetical. Dotfolders,
-  `CONFIG.hiddenFolders` and `CONFIG.hiddenFiles` are left out. Hover a folder
-  for its file and folder counts and total size; hover a file for its type and size.
+- **Tree:** folders keep their existing order, followed by README-prefixed files
+  (for example, `README.md`, `README RFP.md`, or dated backups), then other files.
+  Dotfolders, `CONFIG.hiddenFolders` and `CONFIG.hiddenFiles` are left out. Hover
+  a folder for its file and folder counts and total size; hover a file for its
+  type and size.
 - **README auto-open:** the root README opens on first load, and the first time
   you expand a folder its own README opens. Set `autoOpenFolderReadme: false`
   to turn the folder part off.
@@ -27,6 +29,8 @@ includes the marked HTML fragment and the JavaScript source separately.
 - **Filter:** matches file names (hyphens and spaces count as the same) and shows
   the match count in the heading. Escape or ✕ clears it and restores the folders
   you had open.
+- **Scroll:** the header, filter, and file tree share a scroll area; a floating ↑
+  appears when the panel overflows and returns the whole sidebar to the top.
 - **Keyboard:** `/` goes to the filter, `\` to the tree, Ctrl+B toggles the
   sidebar. In the tree: arrow keys, Home / End and Page Up / Down move and open
   files; Enter or Space toggles a folder; Left / Right collapse and expand.

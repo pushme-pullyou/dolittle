@@ -117,6 +117,32 @@
       border-color: var(--highlight-color);
       color: var(--highlight-color);
     }
+
+    .dev-config {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .dev-config p {
+      margin: 0 0 0.5rem;
+    }
+
+    .dev-config dl {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 0.25rem 0.75rem;
+      margin: 0;
+    }
+
+    .dev-config dt {
+      opacity: 0.8;
+    }
+
+    .dev-config dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
   </style>
 </head>
 
@@ -126,7 +152,7 @@
   <header>
     <button id="btnToggleSidebar" class="header-btn" title="Close sidebar (Ctrl/⌘ B)" aria-label="Toggle sidebar"
       aria-controls="sidebar" aria-expanded="true">☰</button>
-    <a id="headerGitHub" href="." title="View on GitHub" aria-label="View on GitHub">
+    <a id="headerGitHub" href="." title="Back to the start" aria-label="Back to the start">
       <!-- App brand mark: the deployment's favicon.ico (static; the standalone
            harness rewrites the src to ../../../favicon.ico). aria-hidden: the anchor's
            aria-label names the link. -->
@@ -171,10 +197,10 @@
         <h3>Installs</h3>
       </div>
       <nav class="dev-menu" aria-label="TooToo install previews">
-        <button type="button" data-owner="heritage-happenings" data-repo="heritage-happenings.github.io" data-branch="main" aria-pressed="false">heritage-happenings.github.io</button>
+        <button type="button" data-owner="heritage-happenings" data-repo="heritage-happenings.github.io" data-branch="master" aria-pressed="false">heritage-happenings.github.io</button>
         <button type="button" data-owner="heritage-happenings" data-repo="documents" data-branch="main" aria-pressed="false">heritage-happenings-documents</button>
         <button type="button" data-owner="pushme-pullyou" data-repo="assets" data-branch="main" aria-pressed="false">pushme-pullyou-assets</button>
-        <button type="button" data-owner="pushme-pullyou" data-repo="2019" data-branch="master" aria-pressed="false">pushme-pullyou-github</button>
+        <button type="button" data-owner="pushme-pullyou" data-repo="2019" data-branch="main" aria-pressed="false">pushme-pullyou-github</button>
         <button type="button" data-owner="pushme-pullyou" data-repo="pushme-pullyou.github.io" data-branch="main" aria-pressed="false">pushme-pullyou-github-io</button>
         <button type="button" data-owner="theo-armour" data-repo="2025" data-branch="main" aria-pressed="false">theo-armour-2025</button>
         <button type="button" data-owner="theo-armour" data-repo="2026" data-branch="main" aria-pressed="false">theo-armour-2026</button>
@@ -220,12 +246,21 @@
         <div class="dev-presets" id="devFonts">
           <span>Heading font:</span>
         </div>
+
+        <section class="dev-controls dev-config" id="devInstallConfig" aria-labelledby="devConfigHeading" hidden>
+          <h2 id="devConfigHeading">📄 Install tootoo.config.js</h2>
+          <p id="devConfigStatus" role="status"></p>
+          <dl id="devConfigOther"></dl>
+        </section>
       </div>
     </section>
   </main>
 
   <!-- Component dependencies. -->
   <script src="../../js/core.js"></script>
+  <!-- Built-in defaults, before the mock overwrites them: an install's config is
+       merged over these, exactly as main.js merges window.TOOTOO_CONFIG. -->
+  <script>const CONFIG_DEFAULTS = structuredClone( CONFIG );</script>
   <script src="../../mock/mock-data.js"></script>
   <script src="header.js"></script>
 
@@ -252,13 +287,6 @@
 
     const reflectConfig = ( id, key ) => byId( id ).addEventListener( 'input', ( e ) => {
       CONFIG[ key ] = e.target.value; updateHeaderFromConfig();
-    } );
-
-    // sourceRepoUrl is wired into #headerGitHub once at init (header.js), so mirror
-    // it onto the href directly — updateHeaderFromConfig doesn't touch the link.
-    const reflectSource = () => byId( 'ctlSource' ).addEventListener( 'input', ( e ) => {
-      CONFIG.sourceRepoUrl = e.target.value;
-      byId( 'headerGitHub' ).setAttribute( 'href', e.target.value || '#' );
     } );
 
     // headingFont sets --heading-font (consumed by #headerTitle + h1–h6 CSS);
@@ -324,24 +352,198 @@
     reflectConfig( 'ctlSubtitle', 'subtitle' );
     reflectConfig( 'ctlColor', 'themeColor' );
     reflectConfig( 'ctlAppName', 'appName' );
-    reflectSource();
+    reflectConfig( 'ctlSource', 'sourceRepoUrl' );   // used by the About panel (?)
     reflectHeadingFont();
     reflectFontUrl();
     syncBranchChip();
 
+    // ── Install buttons load that repo's real tootoo.config.js and apply it the way
+    // main.js does: built-in defaults, then the install's values on top. ──
+
+    // Reads `window.TOOTOO_CONFIG = { … }` as data — strings, numbers, booleans, null,
+    // arrays, nested objects, comments, trailing commas — without executing the file.
+    // Repeated keys are reported; the last one wins, as in JavaScript.
+    const parseConfigLiteral = ( src ) => {
+      const start = src.search( /TOOTOO_CONFIG\s*=\s*\{/ );
+      if ( start < 0 ) throw new Error( 'no window.TOOTOO_CONFIG = { … } found' );
+      let i = src.indexOf( '{', start );
+      const duplicates = [];
+      const fail = ( msg ) => { throw new Error( `${ msg } (line ${ src.slice( 0, i ).split( '\n' ).length })` ); };
+      const skip = () => {
+        for ( ; ; ) {
+          if ( /\s/.test( src[ i ] ) ) i++;
+          else if ( src.startsWith( '//', i ) ) { const n = src.indexOf( '\n', i ); i = n < 0 ? src.length : n; }
+          else if ( src.startsWith( '/*', i ) ) { const n = src.indexOf( '*/', i + 2 ); if ( n < 0 ) fail( 'unclosed comment' ); i = n + 2; }
+          else return;
+        }
+      };
+      const ESCAPES = { n: '\n', r: '\r', t: '\t', b: '\b', f: '\f', v: '\v', 0: '\0' };
+      const string = () => {
+        const quote = src[ i++ ];
+        let out = '';
+        while ( i < src.length && src[ i ] !== quote && src[ i ] !== '\n' ) {
+          let c = src[ i++ ];
+          if ( c === '\\' ) {
+            c = src[ i++ ];
+            const hex = c === 'u' ? 4 : c === 'x' ? 2 : 0;
+            if ( hex ) {
+              const code = src.slice( i, i + hex );
+              if ( !new RegExp( `^[0-9a-f]{${ hex }}$`, 'i' ).test( code ) ) fail( 'bad escape' );
+              c = String.fromCharCode( parseInt( code, 16 ) );
+              i += hex;
+            } else c = ESCAPES[ c ] ?? c;
+          }
+          out += c;
+        }
+        if ( src[ i ] !== quote ) fail( 'unterminated string' );
+        i++;
+        return out;
+      };
+      const object = ( track ) => {
+        i++;
+        const obj = {};
+        for ( ; ; ) {
+          skip();
+          if ( src[ i ] === '}' ) { i++; return obj; }
+          let key;
+          if ( src[ i ] === '"' || src[ i ] === "'" ) key = string();
+          else {
+            key = /^[A-Za-z_$][\w$]*/.exec( src.slice( i ) )?.[ 0 ];
+            if ( !key ) fail( 'expected a setting name' );
+            i += key.length;
+          }
+          if ( key === '__proto__' ) fail( 'unsupported key __proto__' );
+          skip();
+          if ( src[ i ] !== ':' ) fail( `expected ":" after ${ key }` );
+          i++;
+          const v = value();
+          if ( track && Object.hasOwn( obj, key ) ) duplicates.push( key );
+          obj[ key ] = v;
+          skip();
+          if ( src[ i ] === ',' ) i++;
+          else if ( src[ i ] !== '}' ) fail( 'expected "," or "}"' );
+        }
+      };
+      const value = () => {
+        skip();
+        const c = src[ i ];
+        if ( c === '"' || c === "'" ) return string();
+        if ( c === '{' ) return object( false );
+        if ( c === '[' ) {
+          i++;
+          const arr = [];
+          for ( ; ; ) {
+            skip();
+            if ( src[ i ] === ']' ) { i++; return arr; }
+            arr.push( value() );
+            skip();
+            if ( src[ i ] === ',' ) i++;
+            else if ( src[ i ] !== ']' ) fail( 'expected "," or "]"' );
+          }
+        }
+        const literal = /^(?:true|false|null|-?\d+(?:\.\d+)?)(?![\w$.])/.exec( src.slice( i ) )?.[ 0 ];
+        if ( !literal ) fail( 'unsupported value — only plain data is read' );
+        i += literal.length;
+        return JSON.parse( literal );
+      };
+      return { values: object( true ), duplicates };
+    };
+
+    // Public repos: raw.githubusercontent (no API quota). A 404 there also covers
+    // private repos, so retry through the contents API when a ⚙️ token is set.
+    const fetchInstallConfig = async ( owner, repo ) => {
+      const path = `${ encodeURIComponent( owner ) }/${ encodeURIComponent( repo ) }`;
+      const raw = await fetch( `https://raw.githubusercontent.com/${ path }/HEAD/tootoo.config.js`, { cache: 'no-store' } );
+      if ( raw.ok ) return { text: await raw.text() };
+      if ( raw.status !== 404 ) throw new Error( `GitHub returned ${ raw.status }` );
+      if ( !getToken() ) return { text: null, reason: 'private-or-missing' };
+      const api = await fetch( `https://api.github.com/repos/${ path }/contents/tootoo.config.js`,
+        { headers: { ...ghHeaders(), Accept: 'application/vnd.github.raw' } } );
+      if ( api.ok ) return { text: await api.text() };
+      if ( api.status === 404 ) return { text: null, reason: 'missing' };
+      throw new Error( `GitHub API returned ${ api.status }` );
+    };
+
+    const CONTROLLED_KEYS = [ 'owner', 'repo', 'branch', 'subtitle', 'themeColor', 'appName', 'sourceRepoUrl', 'headingFontUrl', 'headingFont' ];
+    // core.js keys the token and preferences by storagePrefix, so the harness keeps
+    // its own — adopting an install's prefix would hide the token set via ⚙️.
+    const PINNED_KEYS = [ 'storagePrefix' ];
+
+    const syncHomeLink = () => {
+      const home = byId( 'headerHome' );
+      home.hidden = !CONFIG.homeUrl;
+      home.href = CONFIG.homeUrl || '#';
+      home.title = CONFIG.homeUrl ? `Home — ${ CONFIG.homeUrl }` : 'Home';
+    };
+
+    const applyInstallConfig = ( button, values ) => {
+      const pinned = Object.fromEntries( PINNED_KEYS.map( ( key ) => [ key, CONFIG[ key ] ] ) );
+      for ( const key of Object.keys( CONFIG ) ) delete CONFIG[ key ];
+      Object.assign( CONFIG, structuredClone( CONFIG_DEFAULTS ), values, pinned );
+      state.owner = CONFIG.owner = CONFIG.owner || button.dataset.owner;
+      state.repo = CONFIG.repo = CONFIG.repo || button.dataset.repo;
+      state.branch = CONFIG.branch = CONFIG.branch || button.dataset.branch;   // '' = the repo's default branch
+
+      [ [ 'ctlOwner', 'owner' ], [ 'ctlRepo', 'repo' ], [ 'ctlBranch', 'branch' ], [ 'ctlSubtitle', 'subtitle' ],
+        [ 'ctlAppName', 'appName' ], [ 'ctlSource', 'sourceRepoUrl' ] ].forEach( ( [ id, key ] ) => { byId( id ).value = CONFIG[ key ] || ''; } );
+
+      // An empty themeColor means the CSS default, so drop the previous install's override.
+      if ( !CONFIG.themeColor ) {
+        document.documentElement.style.removeProperty( '--highlight-color' );
+        document.body.style.removeProperty( '--highlight-color' );
+      }
+      const shownColor = CONFIG.themeColor ||
+        getComputedStyle( document.documentElement ).getPropertyValue( '--highlight-color' ).trim();
+      if ( /^#[0-9a-f]{6}$/i.test( shownColor ) ) byId( 'ctlColor' ).value = shownColor;
+
+      updateHeaderFromConfig();
+      syncBranchChip();
+      syncHomeLink();
+      applyFont( { headingFont: CONFIG.headingFont, headingFontUrl: CONFIG.headingFontUrl } );
+    };
+
+    const showConfigReport = ( statusHtml, values = {} ) => {
+      byId( 'devInstallConfig' ).hidden = false;
+      byId( 'devConfigStatus' ).innerHTML = statusHtml;
+      byId( 'devConfigOther' ).innerHTML = Object.entries( values )
+        .filter( ( [ key ] ) => !CONTROLLED_KEYS.includes( key ) )
+        .map( ( [ key, v ] ) => `<dt>${ escapeHTML( key ) }</dt><dd><code>${ escapeHTML( JSON.stringify( v ) ) }</code></dd>` )
+        .join( '' );
+    };
+
+    let installLoad = 0;   // newest click wins; a slower earlier fetch is dropped
     document.querySelectorAll( '.dev-menu button' ).forEach( ( button ) => {
-      button.addEventListener( 'click', () => {
-        const setInput = ( id, value ) => {
-          const input = byId( id );
-          input.value = value;
-          input.dispatchEvent( new Event( 'input', { bubbles: true } ) );
-        };
-        setInput( 'ctlOwner', button.dataset.owner );
-        setInput( 'ctlRepo', button.dataset.repo );
-        setInput( 'ctlBranch', button.dataset.branch );
-        setInput( 'ctlSource', `https://github.com/${ button.dataset.owner }/${ button.dataset.repo }` );
+      button.addEventListener( 'click', async () => {
+        if ( activePanel ) closeInfoPanel();   // the controls are detached while ?/⚙️ is open
         document.querySelectorAll( '.dev-menu button' ).forEach( ( item ) =>
           item.setAttribute( 'aria-pressed', String( item === button ) ) );
+        const seq = ++installLoad;
+        const { owner, repo } = button.dataset;
+        const name = escapeHTML( `${ owner }/${ repo }` );
+        const fileUrl = `https://github.com/${ encodeURIComponent( owner ) }/${ encodeURIComponent( repo ) }/blob/HEAD/tootoo.config.js`;
+        showConfigReport( `Loading ${ name } tootoo.config.js…` );
+        let values = {};
+        let status;
+        try {
+          const res = await fetchInstallConfig( owner, repo );
+          if ( seq !== installLoad ) return;
+          if ( res.text === null ) {
+            status = res.reason === 'missing'
+              ? `${ name } has no tootoo.config.js — showing TooToo defaults.`
+              : `⚠️ Couldn't read ${ name } tootoo.config.js — the repo may be private. Set a token with ⚙️, then select it again. Showing TooToo defaults.`;
+          } else {
+            const parsed = parseConfigLiteral( res.text );
+            values = parsed.values;
+            const dupes = [ ...new Set( parsed.duplicates ) ];
+            status = `Loaded <a href="${ escapeHTML( fileUrl ) }" target="_blank" rel="noopener">${ name } tootoo.config.js</a>. Other settings (not editable here):` +
+              ( dupes.length ? `<br>⚠️ Set more than once (the last value wins): <code>${ escapeHTML( dupes.join( ', ' ) ) }</code>` : '' );
+          }
+        } catch ( err ) {
+          if ( seq !== installLoad ) return;
+          status = `⚠️ Couldn't load ${ name } tootoo.config.js: ${ escapeHTML( err.message ) }. Showing TooToo defaults.`;
+        }
+        applyInstallConfig( button, values );
+        showConfigReport( status, values );
       } );
     } );
 

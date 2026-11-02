@@ -1146,7 +1146,7 @@ body.dark-mode pre {
   <header>
     <button id="btnToggleSidebar" class="header-btn" title="Close sidebar (Ctrl/⌘ B)" aria-label="Toggle sidebar"
       aria-controls="sidebar" aria-expanded="true">☰</button>
-    <a id="headerGitHub" href="." title="View on GitHub" aria-label="View on GitHub">
+    <a id="headerGitHub" href="." title="Back to the start" aria-label="Back to the start">
       <!-- App brand mark: the deployment's favicon.ico (static; the standalone
            harness rewrites the src to ../../../favicon.ico). aria-hidden: the anchor's
            aria-label names the link. -->
@@ -1851,6 +1851,35 @@ const setHeaderTimestamp = () => {
   titleEl.title = `Last updated: ${ when } · click to reload`;
 };
 
+// The repo whose index.html is running: <owner>.github.io/<repo>/ from the address,
+// else the install's own repo (homeRepo, or CONFIG before detection runs).
+const hostRepoLabel = () => {
+  if ( location.hostname.endsWith( '.github.io' ) ) {
+    const owner = location.hostname.split( '.' )[ 0 ];
+    const first = location.pathname.split( '/' ).filter( Boolean )[ 0 ] || '';
+    return `${ owner } / ${ first && !/\.html?$/i.test( first ) ? first : `${ owner }.github.io` }`;
+  }
+  const owner = homeRepo.owner || CONFIG.owner;
+  const repo = homeRepo.repo || CONFIG.repo;
+  return owner && repo ? `${ owner } / ${ repo }` : '';
+};
+
+const resetToStart = () => {
+  clearCurrentFile();
+  try { localStorage.removeItem( repoCacheKey() ); } catch ( _ ) { /* storage off */ }
+  if ( location.search || location.hash ) location.replace( location.pathname );
+  else location.reload();
+};
+
+const updateBrandLink = () => {
+  const brand = document.getElementById( 'headerGitHub' );
+  if ( !brand ) return;
+  const host = hostRepoLabel();
+  const tip = host ? `Back to the start — ${ host }` : 'Back to the start';
+  brand.title = tip;
+  brand.setAttribute( 'aria-label', tip );
+};
+
 const updateHeaderFromConfig = () => {
   if ( CONFIG.themeColor ) {
     document.documentElement.style.setProperty( '--highlight-color', CONFIG.themeColor );
@@ -1880,6 +1909,7 @@ const updateHeaderFromConfig = () => {
     titleEl.textContent = CONFIG.appName;
   }
   setHeaderTimestamp();
+  updateBrandLink();
   if ( subtitleEl ) {
     if ( CONFIG.subtitle ) {
       subtitleEl.textContent = '· ' + CONFIG.subtitle;
@@ -1941,13 +1971,21 @@ const initHeaderControls = () => {
   document.getElementById( 'headerTitle' )?.addEventListener( 'click', ( e ) => {
     if ( e.target.closest( 'a' ) ) return;
     e.preventDefault();
-    clearCurrentFile();
-    try { localStorage.removeItem( repoCacheKey() ); } catch ( _ ) { /* storage off */ }
-    if ( location.search || location.hash ) location.replace( location.pathname );
-    else location.reload();
+    resetToStart();
   } );
 
-  document.getElementById( 'headerGitHub' )?.setAttribute( 'href', CONFIG.sourceRepoUrl || '#' );
+  // Brand icon → the same reset. The owner/repo links can wander anywhere; this is
+  // the fixed way back to the page that loaded TooToo. A plain href keeps
+  // middle-click / open-in-new-tab working.
+  const brand = document.getElementById( 'headerGitHub' );
+  if ( brand ) {
+    brand.href = location.pathname;
+    brand.addEventListener( 'click', ( e ) => {
+      if ( e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey ) return;
+      e.preventDefault();
+      resetToStart();
+    } );
+  }
 
   // ⌂ hub link: a fork's tootoo.config.js sets homeUrl to its hub page (e.g. the
   // owner's github.io); without one the anchor stays hidden.

@@ -23,6 +23,7 @@ const initApp = async () => {
   initHeader();     // header.js  — branding + appearance controls
   initContent();    // content.js — wire Copy / view-toggle / etc.
   renderFooter();   // footer.js  — brand bar
+  applyFaviconFile(); // core.js — use the configured icon file, without generating one
   applyHeadingFont(); // core.js  — load + apply CONFIG.headingFont(Url) for headings/title
 
   await detectLocalMode();  // core.js — file:// drop-in: seed owner/repo, read files from disk

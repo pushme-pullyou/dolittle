@@ -27,6 +27,12 @@ the single-file GitHub repo viewer. JipJip, DabDab and GubGub will be born here 
 
 **Both `index.html` files — dev and production — are generated. Never hand-edit either.**
 
+Favicons are plain files: set `faviconFile: 'favicon.ico'` in an install's
+`tootoo.config.js` and provide that file beside `index.html`. Another filename or
+URL is also accepted. An omitted or empty value means no configured app icon
+(the browser may still request `/favicon.ico` automatically). Both config editors
+show an unset value as `none`. The assembler does not create, replace, or copy icons.
+
 ## What's here
 
 ```text

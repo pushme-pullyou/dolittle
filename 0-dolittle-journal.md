@@ -2,6 +2,20 @@
 
 ## 2026-11-02
 
+* **Heading font presets restored** — font buttons in the header settings update
+  both font fields and the live preview, with the selected preset indicated.
+  Choices are included in config downloads; None clears both fields.
+
+* **Configurable icon file** — added `faviconFile` to both config editors and
+  app startup. It uses a supplied file or URL for the tab, header, and footer
+  marks; empty means none. The header preview resolves filenames against the
+  selected install. No icons are generated.
+
+* **Plain favicon.ico only** — removed the assembler's fallback icon generator
+  and obsolete generation comments. The app and brand marks use the provided
+  `favicon.ico` directly; builds leave icon files untouched. The frozen pre-carve
+  reference remains historical, not part of the build.
+
 * **Hide dated backups by default** — `hideDatedBackups` now defaults to `true`.
   Set it to `false` to show backup snapshots. Date-first content stays visible.
   The header settings and standalone config editor reflect the new default.

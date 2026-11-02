@@ -30,9 +30,7 @@
   <script src="footer.js"></script>
   <script>
     renderFooter();
-    // Standalone page: the mark's static src="favicon.ico" resolves relative to
-    // this file (src/components/footer/), so point it at the dev folder's generated one.
-    document.querySelector( '.app-footer-mark' ).src = '../../../favicon.ico';
+    applyFaviconFile( CONFIG.faviconFile ? new URL( CONFIG.faviconFile, new URL( '../../../', location.href ) ).href : '' );
   </script>
 
 </body>

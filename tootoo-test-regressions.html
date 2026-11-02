@@ -44,6 +44,17 @@
         await initApp();
         await until( () => !!document.querySelector( '#viewRendered h1' ) && parseHash().path === 'README.md' );
         check( 'Startup renders a local README', document.querySelector( '#viewRendered h1' )?.textContent === 'Heading' );
+        const iconBefore = CONFIG.faviconFile;
+        CONFIG.faviconFile = 'custom-icon.ico';
+        applyFaviconFile();
+        check( 'Configured icon file updates tab and app marks', document.querySelector( 'link[rel="icon"]' )?.getAttribute( 'href' ) === 'custom-icon.ico'
+          && [ ...document.querySelectorAll( '#headerBrand, .app-footer-mark' ) ].every( ( image ) => !image.hidden && image.getAttribute( 'src' ) === 'custom-icon.ico' ) );
+        CONFIG.faviconFile = '';
+        applyFaviconFile();
+        check( 'No configured icon removes the tab link and hides app marks', !document.querySelector( 'link[rel="icon"]' )
+          && [ ...document.querySelectorAll( '#headerBrand, .app-footer-mark' ) ].every( ( image ) => image.hidden && !image.hasAttribute( 'src' ) ) );
+        CONFIG.faviconFile = iconBefore;
+        applyFaviconFile();
         check( 'Matching checkout uses disk', ( await fetchFileText( 'local-check.md' ) ).includes( 'LOCAL CONTENT' ) );
 
         setUrl( 'owner=remote-owner&repo=remote-repo' );

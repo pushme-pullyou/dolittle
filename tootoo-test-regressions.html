@@ -162,6 +162,12 @@
             : document.activeElement.dataset.path === 'docs/next.txt' );
           await tick();
         }
+        renderTree( [ { path: 'docs', type: 'tree' }, { path: 'docs/next.txt', type: 'blob', size: 1 } ] );
+        document.getElementById( 'treeFilter' ).value = 'next'; runFilter();
+        const match = document.querySelector( '.tree-item[data-path="docs/next.txt"]' ); match.focus();
+        match.dispatchEvent( new KeyboardEvent( 'keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true } ) );
+        check( 'Left Arrow while filtering stays on the match', document.activeElement === match );
+        document.getElementById( 'treeFilter' ).value = ''; runFilter(); await tick();
 
         state.branch = 'feature#notes&more/topic';
         const raw = new URL( rawUrl( 'README.md' ) );
@@ -181,6 +187,20 @@
         history.forward();
         await until( () => state.branch === 'feature#notes' && state.currentFilePath === 'README.md' );
         check( 'Forward restores the next branch and file', true );
+
+        // Tree 404s: a missing branch in a readable repo vs. a private / missing repo.
+        const notFound = () => Promise.resolve( new Response( '{"message":"Not Found"}', { status: 404 } ) );
+        window.fetch = ( url, options = {} ) => String( url ).includes( '/git/trees/' ) || String( url ).includes( '/hidden-repo' )
+          ? notFound() : fixtureFetch( url, options );
+        state.owner = 'local-owner'; state.repo = 'local-repo'; state.branch = 'gone'; activePanel = null;
+        await fetchTree();
+        const hFiles = document.getElementById( 'hFiles' ).textContent;
+        check( 'A missing branch is reported as a branch, not a private repo', document.getElementById( 'treeList' ).textContent.includes( 'Branch “gone” not found' ) && activePanel !== 'token' );
+        check( 'A failed tree load clears the old file count', hFiles === 'Files' );
+        state.repo = 'hidden-repo'; state.branch = 'main';
+        await fetchTree();
+        check( 'An unreadable repo still asks for a token', activePanel === 'token' && !document.getElementById( 'treeList' ).textContent.includes( 'Branch' ) );
+        window.fetch = fixtureFetch; activePanel = null;
 
         // A second startup exercises opening a panel before the tree request completes.
         let releaseTree, treeSignal;

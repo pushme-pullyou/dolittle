@@ -4,7 +4,14 @@ This is the current TooToo roadmap.
 
 ## Agenda
 
-* No-show index.html 
+Want
+
+* Windsor Font
+* favicon in title.
+* Refactor to a pull scenario
+* Refactor to read local files
+* Move a release strategy
+* No-show index.html
 * sflprs gallery
 * 2026-06-16: Photo gallery app
 * 2026-06-16 Ability to load special file format loaders on the fly

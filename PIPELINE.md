@@ -1,15 +1,15 @@
 # TooToo Release Pipeline — Specification
 
-**Status:** draft · **Created:** 2026-06-21 · **Revised:** 2026-10-31 (repo split: dev
-sources live in this workshop repo; production is the sibling `pushme-pullyou-tootoo`
-repo) · **Owner:** Theo
+**Status:** draft · **Created:** 2026-06-21 · **Revised:** 2026-11-18 (added the
+`release` command; 2026-10-31 repo split: dev sources live in this workshop repo;
+production is the sibling `pushme-pullyou-tootoo` repo) · **Owner:** Theo
 
-This document specifies the three chat commands that move a TooToo change from
-the dev sandbox out to every published copy:
+This document specifies the four chat commands that move a TooToo change from
+the dev sandbox out to every published copy, and keep numbered versions of it:
 
 ```
-edit in dev  →  promote  →  sync  →  publish
-                (to prod)   (to installs)  (to the web)
+edit in dev  →  promote  →  sync  →  publish  →  release
+                (to prod)   (to installs)  (to the web)  (keep as rN, optional)
 ```
 
 You type a single word in chat. Claude performs the whole stage and reports back.
@@ -134,7 +134,7 @@ not to skip.
 ## 4. `publish` — push everything to the web
 
 Commits and pushes every repo changed by `promote`/`sync` so each GitHub Pages
-site rebuilds. **This is the only command that performs git pushes.**
+site rebuilds. **Only this command and `release` (§5) perform git pushes.**
 
 > ⚠️ **Exception to the standing "don't commit or push" rule.** This command
 > exists *because* you explicitly asked for it. It still requires an explicit
@@ -176,26 +176,84 @@ GitHub Pages redeploys automatically on push, so "live" follows from the push.
 
 ---
 
-## 5. Target set (downstream copies)
+## 5. `release` — keep a numbered, runnable copy
+
+Freezes the current production build as release `rN` (three.js style: `r1`, `r2`, …)
+so that exact version can be opened and run later, in the browser or from disk.
+Run it after `publish`, and only for builds worth keeping — not every promote needs
+a release.
+
+> ⚠️ **Second exception to the standing "don't commit or push" rule.** Like
+> `publish`, this command commits and pushes, and it also creates tags and a GitHub
+> Release. It requires an explicit confirmation each run. It never uses `--force`,
+> and it never moves, deletes or rewrites an existing tag, release or `releases/rN/`
+> folder — a release, once cut, is permanent.
+
+Each release leaves three things behind:
+
+| What | Where | Why |
+| --- | --- | --- |
+| **Runnable copy** | `<tootoo>\releases\rN\index.html` (+ `tootoo.config.js`) | Click and run: `https://pushme-pullyou.github.io/tootoo/releases/rN/`, or double-click via `file://` |
+| **GitHub Release** | tag `rN` in `pushme-pullyou/tootoo`, titled `rN — YYYY-MM-DD` | Release page, notes, and `index.html` as a download |
+| **Source tag** | tag `rN` in this workshop repo | The `src/` that built it is recoverable |
+
+**Preconditions**
+- `promote` and `publish` have run: the tootoo repo has no uncommitted changes and its
+  `HEAD` is pushed.
+- This workshop repo's sources are committed and pushed (the source tag points at
+  `HEAD`). If they are not, stop and say so — do not commit workshop sources here.
+- Explicit "yes, release rN" confirmation.
+
+**Steps**
+1. **Pick the number**: `N` = highest existing `r<number>` tag in the tootoo repo + 1
+   (first release is `r1`). Date = today, Pacific, `YYYY-MM-DD`.
+2. **Copy** `<tootoo>\index.html` and `<tootoo>\tootoo.config.js` into a new folder
+   `<tootoo>\releases\rN\`. The folder must not already exist.
+3. **List it in the README**: add a line to the top of the `## Releases` section of
+   `<tootoo>\README.md` (create the section above `## Change Log` the first time):
+   `- [rN](https://pushme-pullyou.github.io/tootoo/releases/rN/) — YYYY-MM-DD — <one-line summary>`
+4. **Commit and push the tootoo repo**: `git add releases/rN README.md`,
+   `git commit -m "Release rN — YYYY-MM-DD"`, `git push origin HEAD`.
+5. **Create the GitHub Release** on that commit, with the build attached:
+   `gh release create rN --repo pushme-pullyou/tootoo --target <sha> --title "rN — YYYY-MM-DD" --notes-file <notes> releases/rN/index.html`.
+   Notes = the README change-log entries added since the previous release (for `r1`,
+   the newest entry), plus the runnable link.
+6. **Tag the sources**: in this workshop repo, `git tag rN` at `HEAD`, then
+   `git push origin rN`.
+7. **Check and report**: the release page URL, the runnable URL (GitHub Pages can take
+   a minute or two to serve a new folder), and both tag SHAs.
+
+**Does NOT**: change production `index.html`, touch any install, edit an earlier
+`releases/` folder, or release a build that has not been published.
+
+**What an old release is**: old TooToo code talking to today's GitHub. The CDN
+libraries are pinned, so they stay fixed; the data it browses is live.
+
+---
+
+## 6. Target set (downstream copies)
 
 The list of install targets lives in its own file: **[INSTALL-LIST.md](INSTALL-LIST.md)**. `sync`
 and `publish` read it; when an install is added, moved or retired, edit it there.
 
 ---
 
-## 6. Invariants (must always hold)
+## 7. Invariants (must always hold)
 
-1. Every published `index.html` is byte-identical to canonical production.
+1. Every published `index.html` is byte-identical to canonical production (copies
+   under `releases/rN/` are frozen earlier builds and are the one exception).
 2. All per-repo difference lives in `tootoo.config.js`, never in `index.html`.
 3. Dev differs from production by exactly the config block (`config.js` vs
    `config.prod.js`). Both read `revised` from the shared `src/index.template.html`, so
    after a promote they carry the same stamp.
 4. No command edits `tootoo.config.js`.
-5. Only `publish` performs git writes; it always confirms first.
+5. Only `publish` and `release` perform git writes; each always confirms first.
+6. A release is permanent: no command moves, deletes or rewrites an `rN` tag, a GitHub
+   Release, or a `releases/rN/` folder.
 
 ---
 
-## 7. Decisions (resolved 2026-06-21)
+## 8. Decisions (resolved 2026-06-21)
 
 - **`i:\My Drive\tech`** — **included** as a full sync + publish target (it is a
   git repo).

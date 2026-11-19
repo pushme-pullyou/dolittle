@@ -31,7 +31,7 @@ overwritten by the next assemble/sync.
 
 Key references:
 
-- [`PIPELINE.md`](PIPELINE.md) — the `promote` → `sync` → `publish` release flow.
+- [`PIPELINE.md`](PIPELINE.md) — the `promote` → `sync` → `publish` → `release` flow.
 - [`INSTALL-LIST.md`](INSTALL-LIST.md) — the authoritative list of downstream installs.
 - [`src/ARCHITECTURE.md`](src/ARCHITECTURE.md) — layers, state ownership, component contracts.
 - [`0-dolittle-agenda.md`](0-dolittle-agenda.md) — current priorities.
@@ -45,7 +45,7 @@ Key references:
 2. `pwsh -File assemble.ps1` → rebuild the dev `index.html`; test via `file://`.
 3. Check [`tootoo-test-regressions.html`](tootoo-test-regressions.html) via `file://`
    (it loads the dev build; `?build=production` checks the sibling repo's build).
-4. `promote` / `sync` / `publish` per [`PIPELINE.md`](PIPELINE.md) — only when asked.
+4. `promote` / `sync` / `publish` / `release` per [`PIPELINE.md`](PIPELINE.md) — only when asked.
 
 - Before non-trivial edits, define 2-4 concrete success checks, then verify them.
 - User-facing changes get a dated changelog bullet in the **tootoo repo's** README

@@ -1,5 +1,14 @@
 # TooToo — Development Journal
 
+## 2026-11-18
+
+* **`release` command** — added a fourth pipeline word to `PIPELINE.md` (§5). It
+  freezes the published production build as `rN` (three.js style): a runnable copy
+  in the tootoo repo's `releases/rN/` (live on GitHub Pages), a GitHub Release
+  titled `rN — YYYY-MM-DD` with `index.html` attached, and a matching source tag
+  in this repo. Run after `publish`, only for builds worth keeping. Releases are
+  permanent (new invariant #6). No release has been cut yet.
+
 ## 2026-11-02
 
 * **HTML iframe location** — HTML/HTM previews now load their real local file or

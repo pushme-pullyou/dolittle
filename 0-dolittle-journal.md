@@ -1,5 +1,23 @@
 # TooToo — Development Journal
 
+## 2026-11-21
+
+* **First release, r1** — first run of `release`. Froze the 2026-11-02 build as
+  r1: runnable copy in the tootoo repo's `releases/r1/`, GitHub Release
+  `r1 — 2026-11-21` with `index.html` attached, a new `## Releases` section in its
+  README, and source tag `r1` here at `361adaa`. Pages served 404 for the new
+  folder for the first minute or two, as expected.
+
+* **Install list fixed** — the Julia-Morgan row now points to
+  `2026-theo-github\Julia-Morgan-Building.github.io\index-tootoo.html`. That repo's
+  `index.html` is a hand-customized TooToo Hub build with its config baked in, so
+  `sync` must not overwrite it. Target count corrected to 17.
+
+* **theo-armour.github.io install** — its `index.html` had been hand-edited
+  (header icon, hidden `ignore` folder). Moved both into a new `tootoo.config.js`
+  (`faviconFile: 'theo-logo.ico'`, `hiddenFolders: [ 'ignore' ]`), then synced
+  and published. All 17 installs now match production.
+
 ## 2026-11-18
 
 * **`release` command** — added a fourth pipeline word to `PIPELINE.md` (§5). It

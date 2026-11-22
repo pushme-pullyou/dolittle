@@ -6,7 +6,7 @@ An **install** is a repo that carries an unmodified copy of the canonical `index
 
 ## Targets
 
-All 16 are git repos, so every one is both a `sync` and a `publish` target.
+All 17 are git repos, so every one is both a `sync` and a `publish` target.
 
 The standalone header preview and config editor load this table on startup. Keep the GitHub identity
 and default preview branch with each path; folder names need not match repo names.
@@ -15,7 +15,7 @@ and default preview branch with each path; folder names need not match repo name
 | --- | --- | --- |
 | `g:\My Drive\2026-theo-github\heritage-happenings.github.io\index.html` | heritage-happenings/heritage-happenings.github.io | master |
 | `G:\My Drive\2026-theo-github\heritage-happenings-documents\index.html` | heritage-happenings/documents | main |
-| `G:\My Drive\Julia-Morgan-Building\Julia-Morgan-Building,github.io\index.html` | Julia-Morgan-Building/Julia-Morgan-Building.github.io | main |
+| `g:\My Drive\2026-theo-github\Julia-Morgan-Building.github.io\index-tootoo.html` | Julia-Morgan-Building/Julia-Morgan-Building.github.io | main |
 | `g:\My Drive\2026-theo-github\pushme-pullyou-assets\index.html` | pushme-pullyou/assets | main |
 | `g:\My Drive\2026-theo-github\pushme-pullyou-github-io\index.html` | pushme-pullyou/pushme-pullyou.github.io | main |
 | `g:\My Drive\2026-theo-github\theo-armour-github-io\index.html` | theo-armour/theo-armour.github.io | main |
@@ -42,6 +42,7 @@ and default preview branch with each path; folder names need not match repo name
 - **How the list was found** — discovered 2026-06-21 by scanning for TooToo builds (`TOOTOO_CONFIG` / `appName: 'TooToo'`) that are **not** the canonical repo.
 - **`heritage-happenings-documents`** — added 2026-08-09 as the 14th target. TooToo installs at the repo root, replacing a stub `index.html` that redirected to a `./tootoo/` folder which never existed (the stub is archived beside it as `index-redirect-<TSF>.html`). Its first `tootoo.config.js` was written during that sync — the one and only time a pipeline command creates one; no later command touches it. The repo's pre-existing `.tootoo/` folder is an older, unrelated viewer, not a sync target.
 - **`pushme-pullyou-github-io`** — added 2026-10-29 as the 16th target: the organization's root site, `pushme-pullyou.github.io`. Not to be confused with **`pushme-pullyou-github-2019`** (folder renamed from `pushme-pullyou-github` by 2026-11-01), whose remote is `pushme-pullyou/2019`, the archived 2016–2019 site.
+- **`Julia-Morgan-Building.github.io`** — path fixed 2026-11-21 (the repo now lives under `2026-theo-github`). The install is `index-tootoo.html`; the repo's `index.html` is a hand-customized TooToo Hub build with its config baked in, so `sync` must not overwrite it.
 - **`tech`** — moved from `i:` to `j:\My Drive\tech` (2026-08-09). Its Google Drive letter can shift between machines/remounts, so a "missing" report for this target usually means a changed drive letter, not a deleted install — check the other letters before treating it as gone.
 
 ## Adding an install

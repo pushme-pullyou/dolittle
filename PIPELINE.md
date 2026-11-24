@@ -1,5 +1,8 @@
 # TooToo Release Pipeline — Specification
 
+> **Retired 2026-11-23.** Don't run `promote`, `sync` or `publish`: `sync` would overwrite every install (now on r3) with an r1-era build. Releases and updates now work by pull, with the `release` and `update <install>` commands in [pushme-pullyou/tootoo](https://github.com/pushme-pullyou/tootoo) (see its AGENTS.md). This document is kept as history.
+
+
 **Status:** draft · **Created:** 2026-06-21 · **Revised:** 2026-11-18 (added the
 `release` command; 2026-10-31 repo split: dev sources live in this workshop repo;
 production is the sibling `pushme-pullyou-tootoo` repo) · **Owner:** Theo

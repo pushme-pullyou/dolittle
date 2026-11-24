@@ -1,5 +1,8 @@
 # Dolittle — the workshop 🩺
 
+> **2026-11-23: Dolittle's new role.** TooToo's rebuild now lives in its own repo, [pushme-pullyou/tootoo](https://github.com/pushme-pullyou/tootoo), which holds its source and its releases. Installs pull numbered releases when their owners choose; nothing is pushed out. Dolittle stays the family's core: the Menagerie's shared rules and plans, and the shared code once GubGub begins. The r1-era sources here and the `promote` → `sync` → `publish` pipeline below are **retired**, kept as history.
+
+
 **The Doctor's workshop: where the Pushme-Pullyou menagerie is raised.**
 
 Every animal in the [Pushme-Pullyou](https://github.com/pushme-pullyou) family is born

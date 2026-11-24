@@ -1,5 +1,8 @@
 # TooToo Install List
 
+> **Superseded 2026-11-23.** The list of record is now `INSTALL-LIST.md` in [pushme-pullyou/tootoo](https://github.com/pushme-pullyou/tootoo), with a release column; nothing syncs to installs any more. This copy is kept as history.
+
+
 The downstream copies of TooToo — every `index.html` that `sync` overwrites and `publish` commits + pushes. This is the list of record: when an install is added, moved or retired, edit it here. The release flow itself is in [PIPELINE.md](PIPELINE.md).
 
 An **install** is a repo that carries an unmodified copy of the canonical `index.html`, branded only by its own `tootoo.config.js`. (Not a GitHub *fork* — forking TooToo to change its code is covered in [FORKING.md](FORKING.md).) No pipeline command touches an install's `tootoo.config.js`.

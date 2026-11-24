@@ -1,6 +1,6 @@
 # Dolittle Workshop - AI Agent Instructions
 
-> **2026-11-23: retired pipeline.** TooToo is now developed in [pushme-pullyou/tootoo](https://github.com/pushme-pullyou/tootoo) (local folder `pushme-pullyou-tootoo-next`). **Never run `promote`, `sync` or `publish` from this repo**: `sync` would overwrite every install, now on r3, with an r1-era build. Dolittle stays the family's core (shared rules and plans); see README.md.
+> **2026-11-23: retired pipeline.** TooToo is now developed in [pushme-pullyou/tootoo](https://github.com/pushme-pullyou/tootoo) (local folder `pushme-pullyou-tootoo`). **Never run `promote`, `sync` or `publish` from this repo**: `sync` would overwrite every install, now on r3, with an r1-era build. Dolittle stays the family's core (shared rules and plans); see README.md.
 
 
 Repo-local guidance. These instructions override global defaults only where they are more specific.
